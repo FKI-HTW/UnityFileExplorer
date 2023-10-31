@@ -1,0 +1,20 @@
+{
+    "name": "de.htw-berlin.centis.unityfileexplorer",
+    "version": "0.1.0",
+    "displayName": "UnityFileExplorer",
+    "description": "",
+    "unity": "2022.3",
+    "unityRelease": "11f1",
+    "documentationUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/README.md",
+    "changelogUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/CHANGELOG.md",
+    "licensesUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/LICENSE.md",
+    "keywords": [
+        "Unity Package"
+    ],
+    "samples": [],
+    "author": {
+        "name": "CENTIS HTW-Berlin",
+        "email": "centis-htw-bounces@lists.htw-berlin.de",
+        "url": "https://fki.htw-berlin.de/centis/"
+      }
+}
