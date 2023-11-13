@@ -17,12 +17,12 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public override string ToString()
 		{
-			return Info.Name;
+			return $"{Info.Path}/{Info.Name}";
 		}
 
 		public override int GetHashCode()
 		{
-			return Info.Name.GetHashCode();
+			return ToString().GetHashCode();
 		}
 
 		public bool Equals(TreeNode other)

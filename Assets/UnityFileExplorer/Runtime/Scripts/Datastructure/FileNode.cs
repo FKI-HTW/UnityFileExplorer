@@ -5,7 +5,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 {
 	public class FileNode : TreeNode, IEquatable<FileNode>
 	{
-		public GameObject UIInstance { get; private set; }
+		public UINode UIInstance { get; private set; }
 
 		public FileNode(ExplorerManager manager, NodeInformation info, FolderNode parent)
 			: base(manager, info, parent)
@@ -13,8 +13,11 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance = GameObject.Instantiate(
 				manager.ExplorerConfiguration.FilePrefab, 
 				manager.FileContainer.transform);
-			UIInstance.name = $"{Info.Path}/{Info.Name}";
-			UIInstance.SetActive(false);
+			UIInstance.gameObject.name = ToString();
+			UIInstance.gameObject.SetActive(false);
+			UIInstance.OnSelected += () => manager.SelectNode(this);
+			UIInstance.OnDeselected += () => manager.DeselectNode(this);
+			UIInstance.OnActivated += () => manager.ActivateNode(this);
 		}
 
 		public bool Equals(FileNode other)
@@ -26,18 +29,22 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public override void Show()
 		{
-			UIInstance.SetActive(true);
+			UIInstance.gameObject.SetActive(true);
 		}
 
 		public override void Hide()
 		{
-			UIInstance.SetActive(false);
+			UIInstance.gameObject.SetActive(false);
 		}
 
 		public override void Unload()
 		{
-			if (UIInstance != null)
-				GameObject.Destroy(UIInstance);
+			if (UIInstance == null) return;
+
+			UIInstance.OnSelected -= () => Manager.SelectNode(this);
+			UIInstance.OnDeselected -= () => Manager.DeselectNode(this);
+			UIInstance.OnActivated -= () => Manager.ActivateNode(this);
+			GameObject.Destroy(UIInstance);
 		}
 	}
 }
