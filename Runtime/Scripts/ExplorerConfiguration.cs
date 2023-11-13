@@ -7,11 +7,11 @@ namespace CENTIS.UnityFileExplorer
     [CreateAssetMenu(fileName = "new FileExplorerConfiguration", menuName = "CENTIS/UnityFileExplorer")]
     public class ExplorerConfiguration : ScriptableObject
     {
-        public GameObject FolderPrefab { get => _folderPrefab; set => _folderPrefab = value; }
-        [SerializeField] private GameObject _folderPrefab; // TODO : change to folder class
+        public UINode FolderPrefab { get => _folderPrefab; set => _folderPrefab = value; }
+        [SerializeField] private UINode _folderPrefab;
 
-        public GameObject FilePrefab { get => _filePrefab; set => _filePrefab = value; }
-        [SerializeField] private GameObject _filePrefab; // TODO : change to file class
+        public UINode FilePrefab { get => _filePrefab; set => _filePrefab = value; }
+        [SerializeField] private UINode _filePrefab;
 
         // TODO : add side column prefabs
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using CENTIS.UnityFileExplorer.Datastructure;
 
@@ -42,17 +40,45 @@ namespace CENTIS.UnityFileExplorer
 
 		}
 
-		public void Continue()
+		public void SelectNode(TreeNode node)
 		{
-			// TODO : called upon pressing continue button
-			//		if the selected node is a file it's chosen
-			//		if the selected node is a folder it's navigated to
+			if (node == null) return;
+
+			_selectedNode = node;
+		}
+
+		public void DeselectNode(TreeNode node)
+		{
+			if (_selectedNode == node)
+				_selectedNode = null;
+		}
+
+		public void ActivateNode(TreeNode node)
+		{
+			if (node == null) return;
+
+			switch(node)
+			{
+				case FolderNode folderNode:
+					_currentFolder.NavigateFrom();
+					folderNode.NavigateTo();
+					_currentFolder = folderNode;
+					break;
+				case FileNode fileNode:
+					ChooseFile(fileNode);
+					break;
+			}
+		}
+
+		private void ChooseFile(TreeNode node)
+		{
+
 		}
 
 		public void ChooseFile()
 		{
-			// TODO : this will be called from the file node on double clicks or by a "continue" button
-			// for the currently selected treenode if said node is a file
+			if (_selectedNode == null) return;
+			ChooseFile(_selectedNode);
 		}
 	}
 }
