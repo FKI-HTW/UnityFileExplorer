@@ -65,8 +65,6 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public void NavigateTo()
 		{
-			((FolderNode)Parent).NavigateFrom();
-
 			if (Children == null)
 				throw new NotImplementedException("Folder with unloaded children was opened. Implement loading of children on the fly first!");
 
