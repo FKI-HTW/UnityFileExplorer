@@ -24,7 +24,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		{
 			if (other == null) return false;
 			if (other is not FileNode fileNode) return false;
-			return GetHashCode().Equals(fileNode.GetHashCode());
+			if (!GetHashCode().Equals(fileNode.GetHashCode())) return false;
+			return ToString().Equals(other.ToString());
 		}
 
 		public override void Show()

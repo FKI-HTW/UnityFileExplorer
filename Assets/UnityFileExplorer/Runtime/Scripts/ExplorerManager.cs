@@ -25,6 +25,8 @@ namespace CENTIS.UnityFileExplorer
 		private readonly List<FolderNode> _lastVisitedNodes = new(); // for back arrow
 		private readonly List<FolderNode> _lastReturnedFromNodes = new(); // for forward arrow
 
+		private readonly HashSet<TreeNode> _hashedNodes = new(); // hashset with all node references for O(1) access
+
 		#endregion
 
 		#region public methods
@@ -40,6 +42,7 @@ namespace CENTIS.UnityFileExplorer
 			// 3. Load Root > Main > Users > profile
 			// 4. Whenever a folder is loaded whose contents are not yet loaded (parent or children null, or maybe add an additional flag),
 			//		load them first and update the structure accordingly
+			// 5. Whenever a node is created its reference should also be saved in the hashed nodes to prevent slow finds
 
 			// navigating to a path can be done by either calling NavigateTo of the parent/child, or if the target
 			// is not a direct neighbor, recursevly find the node using the hashcodes
