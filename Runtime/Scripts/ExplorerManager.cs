@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using CENTIS.UnityFileExplorer.Datastructure;
 
@@ -5,7 +6,9 @@ namespace CENTIS.UnityFileExplorer
 {
     public class ExplorerManager : MonoBehaviour
     {
-        public ExplorerConfiguration ExplorerConfiguration { get => _explorerConfiguration; set => _explorerConfiguration = value; }
+		#region fields
+
+		public ExplorerConfiguration ExplorerConfiguration { get => _explorerConfiguration; set => _explorerConfiguration = value; }
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
 
 		public GameObject FileContainer { get => _fileContainer; }
@@ -19,7 +22,14 @@ namespace CENTIS.UnityFileExplorer
 		private TreeNode _selectedNode;
 		private FolderNode _currentFolder;
 
-        public void OpenFileExplorer(string fileExtension = "")
+		private readonly List<FolderNode> _lastVisitedNodes = new(); // for back arrow
+		private readonly List<FolderNode> _lastReturnedToNodes = new(); // for forward arrow
+
+		#endregion
+
+		#region public methods
+
+		public void OpenFileExplorer(string fileExtension = "") // TODO : add action callback for when file was chosen
         {
 			// TODO :
 			// 1. instantiate the main explorer windows and save references in configuration
@@ -62,6 +72,8 @@ namespace CENTIS.UnityFileExplorer
 				case FolderNode folderNode:
 					_currentFolder.NavigateFrom();
 					folderNode.NavigateTo();
+					_lastVisitedNodes.Add(_currentFolder);
+					_lastReturnedToNodes.Clear();
 					_currentFolder = folderNode;
 					break;
 				case FileNode fileNode:
@@ -70,15 +82,45 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
-		private void ChooseFile(TreeNode node)
-		{
-
-		}
-
 		public void ChooseFile()
 		{
 			if (_selectedNode == null) return;
 			ChooseFile(_selectedNode);
 		}
+
+		public void GoBack()
+		{
+			if (_lastVisitedNodes.Count == 0) return;
+
+			FolderNode targetNode = _lastVisitedNodes[^1];
+			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
+			_currentFolder.NavigateFrom();
+			targetNode.NavigateTo();
+			_lastReturnedToNodes.Add(_currentFolder);
+			_currentFolder = targetNode;
+		}
+
+		public void GoForward()
+		{
+			if (_lastReturnedToNodes.Count == 0) return;
+
+			FolderNode targetNode = _lastReturnedToNodes[^1];
+			_lastReturnedToNodes.RemoveAt(_lastReturnedToNodes.Count - 1);
+			_currentFolder.NavigateFrom();
+			targetNode.NavigateTo();
+			_lastVisitedNodes.Add(_currentFolder);
+			_currentFolder = targetNode;
+		}
+
+		#endregion
+
+		#region private methods
+
+		private void ChooseFile(TreeNode node)
+		{
+
+		}
+
+		#endregion
 	}
 }
