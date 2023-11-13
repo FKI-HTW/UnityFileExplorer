@@ -23,7 +23,7 @@ namespace CENTIS.UnityFileExplorer
 		private FolderNode _currentFolder;
 
 		private readonly List<FolderNode> _lastVisitedNodes = new(); // for back arrow
-		private readonly List<FolderNode> _lastReturnedToNodes = new(); // for forward arrow
+		private readonly List<FolderNode> _lastReturnedFromNodes = new(); // for forward arrow
 
 		#endregion
 
@@ -73,7 +73,7 @@ namespace CENTIS.UnityFileExplorer
 					_currentFolder.NavigateFrom();
 					folderNode.NavigateTo();
 					_lastVisitedNodes.Add(_currentFolder);
-					_lastReturnedToNodes.Clear();
+					_lastReturnedFromNodes.Clear();
 					_currentFolder = folderNode;
 					break;
 				case FileNode fileNode:
@@ -96,16 +96,16 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
-			_lastReturnedToNodes.Add(_currentFolder);
+			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
 		}
 
 		public void GoForward()
 		{
-			if (_lastReturnedToNodes.Count == 0) return;
+			if (_lastReturnedFromNodes.Count == 0) return;
 
-			FolderNode targetNode = _lastReturnedToNodes[^1];
-			_lastReturnedToNodes.RemoveAt(_lastReturnedToNodes.Count - 1);
+			FolderNode targetNode = _lastReturnedFromNodes[^1];
+			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
