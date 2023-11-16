@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3045904a3eb7ac4c929f1591635dc60, type: 3}
   m_Name: FileExplorerConfiguration
   m_EditorClassIdentifier: 
-  _fileContainer: {fileID: 0}
-  _folderPrefab: {fileID: 0}
-  _filePrefab: {fileID: 0}
+  _folderPrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
+  _filePrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}

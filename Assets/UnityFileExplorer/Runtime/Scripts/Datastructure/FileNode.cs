@@ -7,7 +7,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 	{
 		public UINode UIInstance { get; private set; }
 
-		public FileNode(ExplorerManager manager, NodeInformation info, FolderNode parent)
+		public FileNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
 			: base(manager, info, parent)
 		{
 			UIInstance = GameObject.Instantiate(
@@ -18,6 +18,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance.OnSelected += () => manager.SelectNode(this);
 			UIInstance.OnDeselected += () => manager.DeselectNode(this);
 			UIInstance.OnActivated += () => manager.ActivateNode(this);
+			UIInstance.Initiate(info);
 		}
 
 		public bool Equals(FileNode other)
