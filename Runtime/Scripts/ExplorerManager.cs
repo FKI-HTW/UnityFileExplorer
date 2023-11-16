@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using CENTIS.UnityFileExplorer.Datastructure;
+using System.IO;
+using System;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -18,39 +20,58 @@ namespace CENTIS.UnityFileExplorer
 
 		// TODO : add explorer path reference
 
-		private TreeNode _root; // a virtual folder above C: / E: etc.
-		private TreeNode _selectedNode;
-		private FolderNode _currentFolder;
+		private VirtualFolderNode	_root; // a virtual folder above the disks
+		private VirtualFolderNode	_currentFolder;
+		private TreeNode			_selectedNode;
 
-		private readonly List<FolderNode> _lastVisitedNodes = new(); // for back arrow
-		private readonly List<FolderNode> _lastReturnedFromNodes = new(); // for forward arrow
+		private readonly List<VirtualFolderNode> _lastVisitedNodes = new(); // for back arrow
+		private readonly List<VirtualFolderNode> _lastReturnedFromNodes = new(); // for forward arrow
 
 		private readonly HashSet<TreeNode> _hashedNodes = new(); // hashset with all node references for O(1) access
 
+		private Action<string> _fileFoundCallback;
+
 		#endregion
+
+		private void Start()
+		{
+			FindFile(onFilePathFound: Debug.Log);
+		}
 
 		#region public methods
 
-		public void OpenFileExplorer(string fileExtension = "") // TODO : add action callback for when file was chosen
+		public void FindFile(string fileExtension = "", Action<string> onFilePathFound = null,
+			Environment.SpecialFolder startFolder = Environment.SpecialFolder.UserProfile)
         {
-			// TODO :
-			// 1. instantiate the main explorer windows and save references in configuration
-			//    OR require the user to define the UI and references beforehand
-			//		We still need to discuss how atomic the individual parts of the window should i.e. 
-			//		if buttons, back arrow etc. are all seperate prefabs or are part of the container class prefab
-			// 2. Load Information from windows' current user
-			// 3. Load Root > Main > Users > profile
-			// 4. Whenever a folder is loaded whose contents are not yet loaded (parent or children null, or maybe add an additional flag),
-			//		load them first and update the structure accordingly
-			// 5. Whenever a node is created its reference should also be saved in the hashed nodes to prevent slow finds
+			_fileFoundCallback = onFilePathFound;
+			_root = new VirtualFolderNode(this, null, null);
+			_currentFolder = _root; // for testing
 
-			// navigating to a path can be done by either calling NavigateTo of the parent/child, or if the target
-			// is not a direct neighbor, recursevly find the node using the hashcodes
+			DriveInfo[] drives = DriveInfo.GetDrives();
+			foreach (DriveInfo drive in drives)
+			{
+				FolderNode diskNode = new(this, drive.GetNodeInformation(), _root);
+				_root.AddChild(diskNode);
+				_hashedNodes.Add(diskNode);
+
+				diskNode.Show(); // for testing
+			}
+
+			/* TODO : commented out for testing purposed, do not remove!
+			string startFolderPath = Environment.GetFolderPath(startFolder);
+			DirectoryInfo startDir = new(startFolderPath);
+			VirtualFolderNode startParent = FindParentRecursive(startDir);
+			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
+			startParent.AddChild(startNode);
+			_hashedNodes.Add(startNode);
+			_currentFolder = startParent;
+			ActivateNode(startNode);
+			*/
 		}
 
-		public void CloseFileExplorer()
+		public void CancelFindFile()
 		{
-
+			_fileFoundCallback = null;
 		}
 
 		public void SelectNode(TreeNode node)
@@ -74,6 +95,11 @@ namespace CENTIS.UnityFileExplorer
 			{
 				case FolderNode folderNode:
 					_currentFolder.NavigateFrom();
+					if (!IsFolderLoaded(folderNode))
+					{
+						AddDirectories(folderNode);
+						AddFiles(folderNode);
+					}
 					folderNode.NavigateTo();
 					_lastVisitedNodes.Add(_currentFolder);
 					_lastReturnedFromNodes.Clear();
@@ -88,6 +114,7 @@ namespace CENTIS.UnityFileExplorer
 		public void ChooseFile()
 		{
 			if (_selectedNode == null) return;
+
 			ChooseFile(_selectedNode);
 		}
 
@@ -95,7 +122,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			if (_lastVisitedNodes.Count == 0) return;
 
-			FolderNode targetNode = _lastVisitedNodes[^1];
+			VirtualFolderNode targetNode = _lastVisitedNodes[^1];
 			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
@@ -107,7 +134,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			if (_lastReturnedFromNodes.Count == 0) return;
 
-			FolderNode targetNode = _lastReturnedFromNodes[^1];
+			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
 			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
@@ -121,7 +148,56 @@ namespace CENTIS.UnityFileExplorer
 
 		private void ChooseFile(TreeNode node)
 		{
+			_fileFoundCallback?.Invoke(node.ToString());
+		}
 
+		private bool IsFolderLoaded(VirtualFolderNode folder)
+		{
+			string folderPath = folder.ToString();
+			int containedDir = Directory.GetDirectories(folderPath).Length;
+			int containedFiles = Directory.GetFiles(folderPath).Length;
+			return folder.Children.Count >= containedDir + containedFiles;
+		}
+
+		private void AddDirectories(VirtualFolderNode folder)
+		{
+			string folderPath = folder.ToString();
+			IEnumerable<DirectoryInfo> containedDir = new DirectoryInfo(folderPath).GetDirectories();
+			foreach (DirectoryInfo dir in containedDir)
+			{
+				FolderNode folderNode = new(this, dir.GetNodeInformation(), folder);
+				folder.AddChild(folderNode);
+				_hashedNodes.Add(folderNode);
+			}
+		}
+
+		private void AddFiles(VirtualFolderNode folder)
+		{
+			string folderPath = folder.ToString();
+			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
+			foreach (FileInfo file in containedFiles)
+			{
+				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
+				folder.AddChild(fileNode);
+				_hashedNodes.Add(fileNode);
+			}
+		}
+
+		private bool TryFindNode(DirectoryInfo userDir, out TreeNode node)
+		{
+			return _hashedNodes.TryGetValue(new VirtualFolderNode(this, userDir.GetNodeInformation(), null), out node);
+		}
+
+		private FolderNode FindParentRecursive(DirectoryInfo userDir)
+		{
+			if (TryFindNode(userDir.Parent, out TreeNode parent))
+				return (FolderNode)parent;
+
+			FolderNode nextParent = FindParentRecursive(userDir.Parent);
+			FolderNode newNode = new(this, userDir.Parent.GetNodeInformation(), nextParent);
+			nextParent.AddChild(newNode);
+			_hashedNodes.Add(newNode);
+			return newNode;
 		}
 
 		#endregion

@@ -11,8 +11,8 @@ namespace CENTIS.UnityFileExplorer
 
         public abstract void Initiate(NodeInformation nodeInformation);
 
-        protected void FireOnSelected() => OnSelected?.Invoke();
-        protected void FireOnDeselected() => OnDeselected?.Invoke();
-        protected void FireOnActivated() => OnActivated?.Invoke();
+        public void FireOnSelected() => OnSelected?.Invoke();
+        public void FireOnDeselected() => OnDeselected?.Invoke();
+        public void FireOnActivated() => OnActivated?.Invoke();
     }
 }

@@ -17,6 +17,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public override string ToString()
 		{
+			if (string.IsNullOrEmpty(Info.Path))
+				return Info.Name;
 			return $"{Info.Path}/{Info.Name}";
 		}
 

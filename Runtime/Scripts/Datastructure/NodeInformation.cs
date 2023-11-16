@@ -2,7 +2,7 @@ using System;
 
 namespace CENTIS.UnityFileExplorer
 {
-    public struct NodeInformation
+    public class NodeInformation
     {
         public string Name;
         public string Path;
