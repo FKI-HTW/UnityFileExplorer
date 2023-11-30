@@ -53,7 +53,10 @@ namespace CENTIS.UnityFileExplorer
 				diskNode.Show(); // for testing
 			}
 
-			/* TODO : commented out for testing purposes, do not remove!
+			/* Commented out for testing purposes, do not remove!
+			 * This is used to navigate to the given startFolder and create 
+			 * all nodes, that are visited during the navigation.
+			 * 
 			string startFolderPath = Environment.GetFolderPath(startFolder);
 			DirectoryInfo startDir = new(startFolderPath);
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
@@ -90,28 +93,12 @@ namespace CENTIS.UnityFileExplorer
 			switch(node)
 			{
 				case FolderNode folderNode:
-					_currentFolder.NavigateFrom();
-					if (!IsFolderLoaded(folderNode))
-					{
-						AddDirectories(folderNode);
-						AddFiles(folderNode);
-					}
-					folderNode.NavigateTo();
-					_lastVisitedNodes.Add(_currentFolder);
-					_lastReturnedFromNodes.Clear();
-					_currentFolder = folderNode;
+					NavigateToNode(folderNode);
 					break;
 				case FileNode fileNode:
 					ChooseFile(fileNode);
 					break;
 			}
-		}
-
-		public void ChooseFile()
-		{
-			if (_selectedNode == null) return;
-
-			ChooseFile(_selectedNode);
 		}
 
 		public void GoBack()
@@ -142,9 +129,24 @@ namespace CENTIS.UnityFileExplorer
 
 		#region private methods
 
-		private void ChooseFile(TreeNode node)
+		private void NavigateToNode(FolderNode node)
+		{
+			_currentFolder.NavigateFrom();
+			if (!IsFolderLoaded(node))
+			{
+				AddDirectories(node);
+				AddFiles(node);
+			}
+			node.NavigateTo();
+			_lastVisitedNodes.Add(_currentFolder);
+			_lastReturnedFromNodes.Clear();
+			_currentFolder = node;
+		}
+
+		private void ChooseFile(FileNode node)
 		{
 			_fileFoundCallback?.Invoke(node.ToString());
+			// TODO : close explorer ?
 		}
 
 		private bool IsFolderLoaded(VirtualFolderNode folder)
