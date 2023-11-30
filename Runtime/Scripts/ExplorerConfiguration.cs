@@ -13,10 +13,14 @@ namespace CENTIS.UnityFileExplorer
         public UINode FilePrefab { get => _filePrefab; set => _filePrefab = value; }
         [SerializeField] private UINode _filePrefab;
 
-        // TODO : add side column prefabs
+		// TODO : add side column prefabs
 
-        // TODO : add path prefabs?
+		// TODO : add folder path prefabs
 
-        // TODO : add button/arrow prefabs?
-    }
+		// TODO : add button/arrow prefabs
+
+        // TODO : add cancel/x/choose file prefab
+
+        // TODO : add top bar/bottom bar that contains folder path and buttons?
+	}
 }
