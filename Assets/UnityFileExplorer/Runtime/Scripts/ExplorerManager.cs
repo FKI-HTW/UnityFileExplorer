@@ -16,10 +16,6 @@ namespace CENTIS.UnityFileExplorer
 		public GameObject FileContainer { get => _fileContainer; }
 		[SerializeField] private GameObject _fileContainer;
 
-		// TODO : add side column reference
-
-		// TODO : add explorer path reference
-
 		private VirtualFolderNode	_root; // a virtual folder above the disks
 		private VirtualFolderNode	_currentFolder;
 		private TreeNode			_selectedNode;
@@ -35,7 +31,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private void Start()
 		{
-			FindFile(onFilePathFound: Debug.Log);
+			FindFile(onFilePathFound: Debug.Log); // for testing
 		}
 
 		#region public methods
@@ -57,7 +53,7 @@ namespace CENTIS.UnityFileExplorer
 				diskNode.Show(); // for testing
 			}
 
-			/* TODO : commented out for testing purposed, do not remove!
+			/* TODO : commented out for testing purposes, do not remove!
 			string startFolderPath = Environment.GetFolderPath(startFolder);
 			DirectoryInfo startDir = new(startFolderPath);
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
