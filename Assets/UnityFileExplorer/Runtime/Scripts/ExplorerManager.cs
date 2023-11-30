@@ -41,7 +41,7 @@ namespace CENTIS.UnityFileExplorer
         {
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, null, null);
-			_currentFolder = _root; // for testing
+			_currentFolder = _root;
 
 			DriveInfo[] drives = DriveInfo.GetDrives();
 			foreach (DriveInfo drive in drives)
@@ -64,13 +64,14 @@ namespace CENTIS.UnityFileExplorer
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode);
 			_currentFolder = startParent;
-			ActivateNode(startNode);
+			NavigateToNode(startNode);
 			*/
 		}
 
 		public void CancelFindFile()
 		{
 			_fileFoundCallback = null;
+			// TODO : close explorer ?
 		}
 
 		public void SelectNode(TreeNode node)
