@@ -63,7 +63,6 @@ namespace CENTIS.UnityFileExplorer
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode);
-			_currentFolder = startParent;
 			NavigateToNode(startNode);
 			*/
 		}
