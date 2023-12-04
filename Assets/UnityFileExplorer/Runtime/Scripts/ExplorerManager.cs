@@ -3,6 +3,7 @@ using UnityEngine;
 using CENTIS.UnityFileExplorer.Datastructure;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -12,6 +13,9 @@ namespace CENTIS.UnityFileExplorer
 
 		public ExplorerConfiguration ExplorerConfiguration { get => _explorerConfiguration; set => _explorerConfiguration = value; }
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
+
+		public GameObject UpperUIBar { get => _upperUIBar; }
+		[SerializeField] private GameObject _upperUIBar;
 
 		public GameObject FileContainer { get => _fileContainer; }
 		[SerializeField] private GameObject _fileContainer;
@@ -27,14 +31,42 @@ namespace CENTIS.UnityFileExplorer
 
 		private Action<string> _fileFoundCallback;
 
+		private Button _exitButton;
+		private Button _backButton;
+		private Button _forwardButton;
+
 		#endregion
 
 		private void Start()
 		{
+			LoadAndConfigureCustomPrefabs();
 			FindFile(onFilePathFound: Debug.Log); // for testing
 		}
 
 		#region public methods
+
+		//Todo - finish method to instantiate and configure personalized ui elements
+		public void LoadAndConfigureCustomPrefabs()
+        {
+			if(_explorerConfiguration.ArrowBackPrefab != null)
+            {
+				_backButton = Instantiate(_explorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
+				_backButton.onClick.AddListener(GoBack);
+			}
+
+			if (_explorerConfiguration.ArrowForwardPrefab != null)
+			{
+				_forwardButton = Instantiate(_explorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
+				_forwardButton.onClick.AddListener(GoForward);
+			}
+
+			if (_explorerConfiguration.ExitButtonPrefab != null)
+			{
+				_exitButton = Instantiate(_explorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
+				_exitButton.onClick.AddListener(CloseWindow);
+			}
+
+		}
 
 		public void FindFile(string fileExtension = "", Action<string> onFilePathFound = null,
 			Environment.SpecialFolder startFolder = Environment.SpecialFolder.UserProfile)
@@ -125,6 +157,14 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = targetNode;
 		}
 
+		public void CloseWindow()
+        {
+			Application.Quit();
+
+			//for not built application in runtime mode, while package is being developed: 
+			UnityEditor.EditorApplication.isPlaying = false;
+        }
+
 		#endregion
 
 		#region private methods
@@ -152,7 +192,7 @@ namespace CENTIS.UnityFileExplorer
 		private bool IsFolderLoaded(VirtualFolderNode folder)
 		{
 			string folderPath = folder.ToString();
-			int containedDir = Directory.GetDirectories(folderPath).Length;
+			int containedDir = Directory.GetDirectories(folderPath).Length; //Todo - hier fliegt UnauthorizedAccessException -> z.B. C:/Dokumente und Einstellungen - catchen
 			int containedFiles = Directory.GetFiles(folderPath).Length;
 			return folder.Children.Count >= containedDir + containedFiles;
 		}
