@@ -4,6 +4,7 @@ using CENTIS.UnityFileExplorer.Datastructure;
 using System.IO;
 using System;
 using UnityEngine.UI;
+using TMPro;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -51,20 +52,26 @@ namespace CENTIS.UnityFileExplorer
 			if(_explorerConfiguration.ArrowBackPrefab != null)
             {
 				_backButton = Instantiate(_explorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
-				_backButton.onClick.AddListener(GoBack);
 			}
+            else { CreatePlaceholderButton("back"); }
+			_backButton.onClick.AddListener(GoBack);
+
 
 			if (_explorerConfiguration.ArrowForwardPrefab != null)
 			{
 				_forwardButton = Instantiate(_explorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
-				_forwardButton.onClick.AddListener(GoForward);
 			}
+			else { CreatePlaceholderButton("forward"); }
+			_forwardButton.onClick.AddListener(GoForward);
+
 
 			if (_explorerConfiguration.ExitButtonPrefab != null)
 			{
 				_exitButton = Instantiate(_explorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
-				_exitButton.onClick.AddListener(CloseWindow);
 			}
+			else { CreatePlaceholderButton("exit"); }
+			_exitButton.onClick.AddListener(CloseWindow);
+
 
 		}
 
@@ -127,6 +134,9 @@ namespace CENTIS.UnityFileExplorer
 				case FolderNode folderNode:
 					NavigateToNode(folderNode);
 					break;
+				case VirtualFolderNode virtualFolderNode:
+					NavigateToNode(virtualFolderNode);
+					break;
 				case FileNode fileNode:
 					ChooseFile(fileNode);
 					break;
@@ -169,8 +179,16 @@ namespace CENTIS.UnityFileExplorer
 
 		#region private methods
 
-		private void NavigateToNode(FolderNode node)
+		private void NavigateToNode(VirtualFolderNode node)
 		{
+
+			try {
+				IsFolderLoaded(node);
+            } catch (UnauthorizedAccessException exception) {
+				MarkFolderWithNoPermissionToAccess(node);
+				return;
+            }
+
 			_currentFolder.NavigateFrom();
 			if (!IsFolderLoaded(node))
 			{
@@ -181,6 +199,16 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.Add(_currentFolder);
 			_lastReturnedFromNodes.Clear();
 			_currentFolder = node;
+		}
+
+		private void MarkFolderWithNoPermissionToAccess(VirtualFolderNode node)
+        {
+			string folderName = node.ToString();
+			GameObject folderObject = GameObject.Find(folderName);
+			TextMeshProUGUI textObject = folderObject.GetComponentInChildren<TextMeshProUGUI>();
+			textObject.color = Color.red;
+			string newName = node.Info.Name + " --- no access permission";
+			textObject.text = newName;
 		}
 
 		private void ChooseFile(FileNode node)
@@ -236,6 +264,25 @@ namespace CENTIS.UnityFileExplorer
 			nextParent.AddChild(newNode);
 			_hashedNodes.Add(newNode);
 			return newNode;
+		}
+
+		private void CreatePlaceholderButton(string givenButtonText)
+		{
+			GameObject newButton = new GameObject(givenButtonText + "Button");
+			_backButton = newButton.AddComponent<Button>();
+			newButton.transform.SetParent(_upperUIBar.transform, false);
+			Image buttonImage = newButton.AddComponent<Image>();
+			buttonImage.color = Color.blue;
+			RectTransform buttonRect = newButton.GetComponent<RectTransform>();
+			buttonRect.sizeDelta = new Vector2(200f, 50f);
+
+			GameObject text = new GameObject("Text");
+			TextMeshProUGUI buttonText = text.AddComponent<TextMeshProUGUI>();
+			buttonText.text = givenButtonText;
+			buttonText.font = Resources.Load<TMP_FontAsset>("LiberationSans SDF ");
+			buttonText.fontSize = 24;
+			buttonText.alignment = TextAlignmentOptions.Center;
+			text.transform.SetParent(newButton.transform, false);
 		}
 
 		#endregion
