@@ -12,4 +12,5 @@ public class UIFolder : UINode
 	{
 		_name.text = info.Name;
 	}
+
 }
