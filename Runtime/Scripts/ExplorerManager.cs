@@ -35,6 +35,8 @@ namespace CENTIS.UnityFileExplorer
 		private Button _exitButton;
 		private Button _backButton;
 		private Button _forwardButton;
+		private Button _cancelButton;
+		private Button _confirmChoiceButton;
 
 		#endregion
 
@@ -56,14 +58,26 @@ namespace CENTIS.UnityFileExplorer
             else { CreatePlaceholderButton("back"); }
 			_backButton.onClick.AddListener(GoBack);
 
-
 			if (_explorerConfiguration.ArrowForwardPrefab != null)
 			{
 				_forwardButton = Instantiate(_explorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
 			}
 			else { CreatePlaceholderButton("forward"); }
 			_forwardButton.onClick.AddListener(GoForward);
-
+			
+			if (_explorerConfiguration.CancelButtonPrefab != null)
+			{
+				_cancelButton = Instantiate(_explorerConfiguration.CancelButtonPrefab, _upperUIBar.transform);
+			}
+			else { CreatePlaceholderButton("cancel"); }
+			_cancelButton.onClick.AddListener(DeselectFile);
+			
+			if (_explorerConfiguration.ChooseFileButtonPrefab != null)
+			{
+				_confirmChoiceButton = Instantiate(_explorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform);
+			}
+			else { CreatePlaceholderButton("choose file"); }
+			_confirmChoiceButton.onClick.AddListener(SelectFile);
 
 			if (_explorerConfiguration.ExitButtonPrefab != null)
 			{
@@ -71,9 +85,24 @@ namespace CENTIS.UnityFileExplorer
 			}
 			else { CreatePlaceholderButton("exit"); }
 			_exitButton.onClick.AddListener(CloseWindow);
-
-
 		}
+
+		public void SelectFile()
+        {
+			//todo find real node that was clicked - not working with _selected node
+			if(_selectedNode is FileNode)
+            {
+				ChooseFile((FileNode)_selectedNode);
+            }
+            else { NavigateToNode((VirtualFolderNode)_selectedNode); }
+        }
+
+		public void DeselectFile()
+        {
+			//TODO find real node that was clicked here as well and exchange _selected node with it
+			DeselectNode(_selectedNode);
+        }
+
 
 		public void FindFile(string fileExtension = "", Action<string> onFilePathFound = null,
 			Environment.SpecialFolder startFolder = Environment.SpecialFolder.UserProfile)
@@ -106,10 +135,14 @@ namespace CENTIS.UnityFileExplorer
 			*/
 		}
 
-		public void CancelFindFile()
+		public void CloseWindow()
 		{
 			_fileFoundCallback = null;
-			// TODO : close explorer ?
+
+			Application.Quit();
+
+			//for not built application in runtime mode, while package is being developed: 
+			UnityEditor.EditorApplication.isPlaying = false;
 		}
 
 		public void SelectNode(TreeNode node)
@@ -166,14 +199,6 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
 		}
-
-		public void CloseWindow()
-        {
-			Application.Quit();
-
-			//for not built application in runtime mode, while package is being developed: 
-			UnityEditor.EditorApplication.isPlaying = false;
-        }
 
 		#endregion
 
