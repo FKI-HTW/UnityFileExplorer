@@ -51,7 +51,8 @@ namespace CENTIS.UnityFileExplorer
 		//Todo - finish method to instantiate and configure personalized ui elements
 		public void LoadAndConfigureCustomPrefabs()
         {
-			if(_explorerConfiguration.ArrowBackPrefab != null)
+			// TODO : use returned buttons and ternary operator
+			if (_explorerConfiguration.ArrowBackPrefab != null)
             {
 				_backButton = Instantiate(_explorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
 			}
@@ -70,79 +71,62 @@ namespace CENTIS.UnityFileExplorer
 				_cancelButton = Instantiate(_explorerConfiguration.CancelButtonPrefab, _upperUIBar.transform);
 			}
 			else { CreatePlaceholderButton("cancel"); }
-			_cancelButton.onClick.AddListener(DeselectFile);
+			_cancelButton.onClick.AddListener(CancelFindFile);
 			
 			if (_explorerConfiguration.ChooseFileButtonPrefab != null)
 			{
 				_confirmChoiceButton = Instantiate(_explorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform);
 			}
 			else { CreatePlaceholderButton("choose file"); }
-			_confirmChoiceButton.onClick.AddListener(SelectFile);
+			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
 
 			if (_explorerConfiguration.ExitButtonPrefab != null)
 			{
 				_exitButton = Instantiate(_explorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
 			}
 			else { CreatePlaceholderButton("exit"); }
-			_exitButton.onClick.AddListener(CloseWindow);
+			_exitButton.onClick.AddListener(CancelFindFile);
 		}
 
-		public void SelectFile()
-        {
-			//todo find real node that was clicked - not working with _selected node
-			if(_selectedNode is FileNode)
-            {
-				ChooseFile((FileNode)_selectedNode);
-            }
-            else { NavigateToNode((VirtualFolderNode)_selectedNode); }
-        }
-
-		public void DeselectFile()
-        {
-			//TODO find real node that was clicked here as well and exchange _selected node with it
-			DeselectNode(_selectedNode);
-        }
-
-
-		public void FindFile(string fileExtension = "", Action<string> onFilePathFound = null,
-			Environment.SpecialFolder startFolder = Environment.SpecialFolder.UserProfile)
+		public void FindFile(
+			string fileExtension = "", 
+			Action<string> onFilePathFound = null,
+			Environment.SpecialFolder? startFolder = null)
         {
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, null, null);
-			_currentFolder = _root;
 
+			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
 			foreach (DriveInfo drive in drives)
 			{
 				FolderNode diskNode = new(this, drive.GetNodeInformation(), _root);
 				_root.AddChild(diskNode);
 				_hashedNodes.Add(diskNode);
-
-				diskNode.Show(); // for testing
 			}
 
-			/* Commented out for testing purposes, do not remove!
-			 * This is used to navigate to the given startFolder and create 
-			 * all nodes, that are visited during the navigation.
-			 * 
-			string startFolderPath = Environment.GetFolderPath(startFolder);
+			if (startFolder == null)
+			{
+				_currentFolder = _root;
+				_root.NavigateTo();
+				return;
+			}
+
+			// used to navigate to the given startFolder and create all nodes, that are visited during the navigation
+			string startFolderPath = Environment.GetFolderPath((Environment.SpecialFolder)startFolder);
 			DirectoryInfo startDir = new(startFolderPath);
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode);
-			NavigateToNode(startNode);
-			*/
+			_currentFolder = startNode;
+			startNode.NavigateTo();
 		}
 
-		public void CloseWindow()
+		public void CancelFindFile()
 		{
 			_fileFoundCallback = null;
-
-			Application.Quit();
-
-			//for not built application in runtime mode, while package is being developed: 
-			UnityEditor.EditorApplication.isPlaying = false;
+			// TODO : close window ?
 		}
 
 		public void SelectNode(TreeNode node)
@@ -206,11 +190,11 @@ namespace CENTIS.UnityFileExplorer
 
 		private void NavigateToNode(VirtualFolderNode node)
 		{
-
+			// TODO : use a better check like Directory.GetAccessControl to check for Access Permission
 			try {
 				IsFolderLoaded(node);
-            } catch (UnauthorizedAccessException exception) {
-				MarkFolderWithNoPermissionToAccess(node);
+            } catch (UnauthorizedAccessException) {
+				node.MissingPermissions();
 				return;
             }
 
@@ -226,16 +210,6 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = node;
 		}
 
-		private void MarkFolderWithNoPermissionToAccess(VirtualFolderNode node)
-        {
-			string folderName = node.ToString();
-			GameObject folderObject = GameObject.Find(folderName);
-			TextMeshProUGUI textObject = folderObject.GetComponentInChildren<TextMeshProUGUI>();
-			textObject.color = Color.red;
-			string newName = node.Info.Name + " --- no access permission";
-			textObject.text = newName;
-		}
-
 		private void ChooseFile(FileNode node)
 		{
 			_fileFoundCallback?.Invoke(node.ToString());
@@ -245,7 +219,7 @@ namespace CENTIS.UnityFileExplorer
 		private bool IsFolderLoaded(VirtualFolderNode folder)
 		{
 			string folderPath = folder.ToString();
-			int containedDir = Directory.GetDirectories(folderPath).Length; //Todo - hier fliegt UnauthorizedAccessException -> z.B. C:/Dokumente und Einstellungen - catchen
+			int containedDir = Directory.GetDirectories(folderPath).Length;
 			int containedFiles = Directory.GetFiles(folderPath).Length;
 			return folder.Children.Count >= containedDir + containedFiles;
 		}
@@ -293,6 +267,8 @@ namespace CENTIS.UnityFileExplorer
 
 		private void CreatePlaceholderButton(string givenButtonText)
 		{
+			// TODO : replace with predefined prefabs at some point
+			// TODO : return Button
 			GameObject newButton = new GameObject(givenButtonText + "Button");
 			_backButton = newButton.AddComponent<Button>();
 			newButton.transform.SetParent(_upperUIBar.transform, false);

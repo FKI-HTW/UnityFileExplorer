@@ -38,5 +38,6 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public abstract void Show();
 		public abstract void Hide();
 		public abstract void Unload();
+		public abstract void MissingPermissions();
 	}
 }
