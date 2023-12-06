@@ -10,6 +10,7 @@ namespace CENTIS.UnityFileExplorer
         public event Action OnActivated;
 
         public abstract void Initiate(NodeInformation nodeInformation);
+        public abstract void MissingPermissions();
 
         public void FireOnSelected() => OnSelected?.Invoke();
         public void FireOnDeselected() => OnDeselected?.Invoke();

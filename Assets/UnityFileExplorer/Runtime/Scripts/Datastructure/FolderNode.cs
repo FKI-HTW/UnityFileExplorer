@@ -55,5 +55,10 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 				GameObject.Destroy(UIInstance);
 			}
 		}
+
+		public override void MissingPermissions()
+		{
+			UIInstance.MissingPermissions();
+		}
 	}
 }

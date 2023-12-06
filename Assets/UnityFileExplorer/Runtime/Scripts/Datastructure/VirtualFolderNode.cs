@@ -42,6 +42,10 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			}
 		}
 
+		public override void MissingPermissions()
+		{ 
+		}
+
 		public void UpdateChildren(List<TreeNode> children)
 		{
 			Children = children;

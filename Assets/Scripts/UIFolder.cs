@@ -13,4 +13,8 @@ public class UIFolder : UINode
 		_name.text = info.Name;
 	}
 
+	public override void MissingPermissions()
+	{
+		_name.text += " --- Unauthorized Access!";
+	}
 }
