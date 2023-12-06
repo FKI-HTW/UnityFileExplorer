@@ -23,7 +23,6 @@ namespace CENTIS.UnityFileExplorer
         public Button ExitButtonPrefab { get => _exitButtonPrefab; set => _exitButtonPrefab = value; }
         [SerializeField] private Button _exitButtonPrefab;
 
-        // TODO : add cancel/choose file prefab
         public Button CancelButtonPrefab { get => _cancelButtonPrefab; set => _cancelButtonPrefab = value; }
         [SerializeField] private Button _cancelButtonPrefab;
 

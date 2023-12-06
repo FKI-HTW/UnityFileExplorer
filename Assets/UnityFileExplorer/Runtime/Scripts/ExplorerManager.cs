@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System;
-using TMPro;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -12,7 +11,16 @@ namespace CENTIS.UnityFileExplorer
     {
 		#region fields
 
-		public ExplorerConfiguration ExplorerConfiguration { get => _explorerConfiguration; set => _explorerConfiguration = value; }
+		public ExplorerConfiguration ExplorerConfiguration 
+		{ 
+			get
+			{
+				if (_explorerConfiguration != null)
+					return _explorerConfiguration;
+				return _explorerConfiguration = (ExplorerConfiguration)Resources.Load("DefaultFileExplorerConfiguration");
+			}
+			set => _explorerConfiguration = value; 
+		}
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
 
 		public GameObject UpperUIBar { get => _upperUIBar; }
@@ -42,38 +50,27 @@ namespace CENTIS.UnityFileExplorer
 
 		private void Start()
 		{
-			LoadAndConfigureCustomPrefabs();
+			LoadCustomPrefabs();
 			FindFile(onFilePathFound: Debug.Log); // for testing
 		}
 
 		#region public methods
 
-		//Todo - finish method to instantiate and configure personalized ui elements
-		public void LoadAndConfigureCustomPrefabs()
+		public void LoadCustomPrefabs()
         {
-			_backButton = _explorerConfiguration.ArrowBackPrefab != null
-				? Instantiate(_explorerConfiguration.ArrowBackPrefab, _upperUIBar.transform)
-				: CreatePlaceholderButton("back");
+			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
 			_backButton.onClick.AddListener(GoBack);
 			
-			_forwardButton = _explorerConfiguration.ArrowForwardPrefab != null
-				? Instantiate(_explorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform)
-				: CreatePlaceholderButton("forward"); 
+			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform); 
 			_forwardButton.onClick.AddListener(GoForward);
 
-			_cancelButton = _explorerConfiguration.CancelButtonPrefab != null
-				? Instantiate(_explorerConfiguration.CancelButtonPrefab, _upperUIBar.transform)
-				: CreatePlaceholderButton("cancel"); 
+			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _upperUIBar.transform); 
 			_cancelButton.onClick.AddListener(CancelFindFile);
 
-			_confirmChoiceButton = _explorerConfiguration.ChooseFileButtonPrefab != null
-				? Instantiate(_explorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform)
-				: CreatePlaceholderButton("choose file"); 
+			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform); 
 			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
 
-			_exitButton = _explorerConfiguration.ExitButtonPrefab != null
-				? Instantiate(_explorerConfiguration.ExitButtonPrefab, _upperUIBar.transform)
-				: CreatePlaceholderButton("exit"); 
+			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform); 
 			_exitButton.onClick.AddListener(CancelFindFile);
 		}
 
@@ -254,27 +251,6 @@ namespace CENTIS.UnityFileExplorer
 			nextParent.AddChild(newNode);
 			_hashedNodes.Add(newNode);
 			return newNode;
-		}
-
-		private Button CreatePlaceholderButton(string givenButtonText)
-		{
-			// TODO : replace with predefined prefabs at some point
-			Button newButton = new GameObject(givenButtonText + "Button").AddComponent<Button>();
-			newButton.transform.SetParent(_upperUIBar.transform, false);
-			Image buttonImage = newButton.gameObject.AddComponent<Image>();
-			buttonImage.color = Color.blue;
-			RectTransform buttonRect = newButton.GetComponent<RectTransform>();
-			buttonRect.sizeDelta = new Vector2(200f, 50f);
-
-			GameObject text = new("Text");
-			TextMeshProUGUI buttonText = text.AddComponent<TextMeshProUGUI>();
-			buttonText.text = givenButtonText;
-			buttonText.font = Resources.Load<TMP_FontAsset>("LiberationSans SDF ");
-			buttonText.fontSize = 24;
-			buttonText.alignment = TextAlignmentOptions.Center;
-			text.transform.SetParent(newButton.transform, false);
-
-			return newButton;
 		}
 
 		#endregion
