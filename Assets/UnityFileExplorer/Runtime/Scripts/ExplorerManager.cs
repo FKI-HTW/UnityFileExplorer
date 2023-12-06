@@ -1,9 +1,9 @@
- using System.Collections.Generic;
-using UnityEngine;
+using System.Collections.Generic;
 using CENTIS.UnityFileExplorer.Datastructure;
+using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 using System;
-using UnityEngine.UI;
 using TMPro;
 
 namespace CENTIS.UnityFileExplorer
@@ -32,11 +32,11 @@ namespace CENTIS.UnityFileExplorer
 
 		private Action<string> _fileFoundCallback;
 
-		private GameObject _exitButton;
-		private GameObject _backButton;
-		private GameObject _forwardButton;
-		private GameObject _cancelButton;
-		private GameObject _confirmChoiceButton;
+		private Button _exitButton;
+		private Button _backButton;
+		private Button _forwardButton;
+		private Button _cancelButton;
+		private Button _confirmChoiceButton;
 
 		#endregion
 
@@ -54,34 +54,34 @@ namespace CENTIS.UnityFileExplorer
 			_backButton = _explorerConfiguration.ArrowBackPrefab != null
 				? Instantiate(_explorerConfiguration.ArrowBackPrefab, _upperUIBar.transform)
 				: CreatePlaceholderButton("back");
-			_backButton.GetComponent<Button>().onClick.AddListener(GoBack);
+			_backButton.onClick.AddListener(GoBack);
 			
 			_forwardButton = _explorerConfiguration.ArrowForwardPrefab != null
 				? Instantiate(_explorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform)
 				: CreatePlaceholderButton("forward"); 
-			_forwardButton.GetComponent<Button>().onClick.AddListener(GoForward);
+			_forwardButton.onClick.AddListener(GoForward);
 
 			_cancelButton = _explorerConfiguration.CancelButtonPrefab != null
 				? Instantiate(_explorerConfiguration.CancelButtonPrefab, _upperUIBar.transform)
 				: CreatePlaceholderButton("cancel"); 
-			_cancelButton.GetComponent<Button>().onClick.AddListener(CancelFindFile);
+			_cancelButton.onClick.AddListener(CancelFindFile);
 
 			_confirmChoiceButton = _explorerConfiguration.ChooseFileButtonPrefab != null
 				? Instantiate(_explorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform)
 				: CreatePlaceholderButton("choose file"); 
-			_confirmChoiceButton.GetComponent<Button>().onClick.AddListener(() => ActivateNode(_selectedNode));
+			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
 
 			_exitButton = _explorerConfiguration.ExitButtonPrefab != null
 				? Instantiate(_explorerConfiguration.ExitButtonPrefab, _upperUIBar.transform)
 				: CreatePlaceholderButton("exit"); 
-			_exitButton.GetComponent<Button>().onClick.AddListener(CancelFindFile);
+			_exitButton.onClick.AddListener(CancelFindFile);
 		}
 
 		public void FindFile(
-			string fileExtension = "", 
 			Action<string> onFilePathFound = null,
-			Environment.SpecialFolder? startFolder = null)
-        {
+			Environment.SpecialFolder? startFolder = null,
+			string fileExtension = ""
+        ){
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, null, null);
 
@@ -256,13 +256,12 @@ namespace CENTIS.UnityFileExplorer
 			return newNode;
 		}
 
-		private GameObject CreatePlaceholderButton(string givenButtonText)
+		private Button CreatePlaceholderButton(string givenButtonText)
 		{
 			// TODO : replace with predefined prefabs at some point
-			GameObject newButton = new(givenButtonText + "Button");
-			newButton.AddComponent<Button>();
+			Button newButton = new GameObject(givenButtonText + "Button").AddComponent<Button>();
 			newButton.transform.SetParent(_upperUIBar.transform, false);
-			Image buttonImage = newButton.AddComponent<Image>();
+			Image buttonImage = newButton.gameObject.AddComponent<Image>();
 			buttonImage.color = Color.blue;
 			RectTransform buttonRect = newButton.GetComponent<RectTransform>();
 			buttonRect.sizeDelta = new Vector2(200f, 50f);
