@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3045904a3eb7ac4c929f1591635dc60, type: 3}
+  m_Name: DefaultFileExplorerConfiguration
+  m_EditorClassIdentifier: 
+  _folderPrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
+  _filePrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
+  _arrowBackPrefab: {fileID: 4209207891914893309, guid: 5832582facf4a0e4da93323b205925ac, type: 3}
+  _arrowForwardPrefab: {fileID: 8532966127759619506, guid: 472ee75ee791d994197bc613fd8d8fa5, type: 3}
+  _exitButtonPrefab: {fileID: 9130513981467502345, guid: 3bb5e3aac15750b4a87f4e5c98fc09a3, type: 3}
+  _cancelButtonPrefab: {fileID: 4209207891914893309, guid: 2d5478437fc4a784c8ea366a5ca84e61, type: 3}
+  _chooseFileButtonPrefab: {fileID: 4209207891914893309, guid: e21d9861058e6a54a8a2b54aee29610a, type: 3}

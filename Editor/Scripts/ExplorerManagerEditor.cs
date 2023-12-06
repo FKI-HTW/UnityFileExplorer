@@ -23,9 +23,15 @@ namespace CENTIS.UnityFileExplorer
 
 		public void OnEnable()
 		{
-			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration"); ;
-			_fileContainer = serializedObject.FindProperty("_fileContainer"); ;
-			_upperUIBar = serializedObject.FindProperty("_upperUIBar"); ;
+			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration");
+			_fileContainer = serializedObject.FindProperty("_fileContainer");
+			_upperUIBar = serializedObject.FindProperty("_upperUIBar");
+
+			if (_explorerConfig.objectReferenceValue == null)
+			{
+				_explorerConfig.objectReferenceValue = (ExplorerConfiguration)Resources.Load("DefaultFileExplorerConfiguration");
+				serializedObject.ApplyModifiedProperties();
+			}
 		}
 
 		public override void OnInspectorGUI()
