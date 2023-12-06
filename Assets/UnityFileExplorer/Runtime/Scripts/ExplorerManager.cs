@@ -132,8 +132,10 @@ namespace CENTIS.UnityFileExplorer
 		public void SelectNode(TreeNode node)
 		{
 			if (node == null) return;
-
-			_selectedNode = node;
+			if (node.Equals(_selectedNode))
+				ActivateNode(node);
+			else
+				_selectedNode = node;
 		}
 
 		public void DeselectNode(TreeNode node)
