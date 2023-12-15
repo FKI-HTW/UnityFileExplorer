@@ -206,11 +206,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private void NavigateToNode(VirtualFolderNode node)
 		{
-			// TODO : use a better check like Directory.GetAccessControl to check for Access Permission
 			try {
-				//DirectoryInfo directoryInfo = Directory.CreateDirectory(node.ToString());
-				//DirectorySecurity directorySec = Directory.GetAccessControl(node.ToString(),2);
-				//System.Security.AccessControl.DirectorySecurity secInfo = directoryInfo.GetAccessControl();
 				IsFolderLoaded(node);
 			} catch (UnauthorizedAccessException) {
 				node.MissingPermissions();
@@ -230,7 +226,7 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = node;
 			if (_currentFolder.Children.Count == 0)
 			{
-				_noFilesInfoPrefab.SetActive(true); //To do - deactivate info when gone back
+				_noFilesInfoPrefab.SetActive(true);
 			}
 		}
 
@@ -268,7 +264,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				if (_certainFilesOnly)
 				{
-					string fileInfo = file.Name; //string sieht aus wie dateiname.fileendung(.weitereFileEndungManchmal)
+					string fileInfo = file.Name;
 					if (fileInfo.EndsWith(_fileExtension))
 					{
 						FileNode fileNode = new(this, file.GetNodeInformation(), folder);
