@@ -183,8 +183,9 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = targetNode;
 			_noFilesInfoPrefab.SetActive(false);
 			_forwardButton.interactable = true;
+			UpdateFolderPath(targetNode.ToString());
 
-			if(_lastVisitedNodes.Count == 0)
+			if (_lastVisitedNodes.Count == 0)
             {
 				_backButton.interactable = false;
 			}
@@ -201,6 +202,7 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
 			_backButton.interactable = true;
+			UpdateFolderPath(targetNode.ToString());
 
 			if(_lastReturnedFromNodes.Count == 0)
             {
@@ -211,6 +213,44 @@ namespace CENTIS.UnityFileExplorer
 		#endregion
 
 		#region private methods
+
+		private void UpdateFolderPath(string currentFolderPath)
+		{
+			ClearPath();
+			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar);
+
+			foreach (string folder in folders)
+			{
+				CreateFolderButton(folder);
+				Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			}
+		}
+
+		private void CreateFolderButton(string folderName)
+		{
+			Button folderButton = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			Text buttonText = folderButton.GetComponentInChildren<Text>();
+			buttonText.text = folderName;
+			Button button = folderButton.GetComponent<Button>();
+			button.onClick.AddListener(() => OnFolderButtonClick(folderName)); // check if this is best solution
+		}
+
+		private void ClearPath() {
+			foreach (Transform child in _pathContainerPrefab.transform) 
+			{ 
+				Destroy(child.gameObject); 
+			} 
+		}
+
+		private void OnFolderButtonClick(string folderName) //TODO
+		{
+			// Handle the folder button click (navigate, load contents, etc.)
+			Debug.Log($"Navigate to: {folderName}");
+
+			// this path needs to be the currentFolderPath up to the clicked folder -> update lists of lastVisisted etc. 
+			//newFolderPath = Path.Combine(currentFolderPath, folderName); //this nonsense needs to be updated
+			//UpdateFolderPath(newFolderPath);
+		}
 
 		private void NavigateToNode(VirtualFolderNode node)
 		{

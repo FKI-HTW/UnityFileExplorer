@@ -39,10 +39,10 @@ namespace CENTIS.UnityFileExplorer
         public GameObject PathContainerPrefab { get => _pathContainerPrefab; set => _pathContainerPrefab = value; }
         [SerializeField] private GameObject _pathContainerPrefab;
 
-        private Button FolderButtonPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
-        [SerializeField] private Button _folderButtonPrefab; 
+        public Button FolderButtonPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
+        [SerializeField] private Button _folderButtonPrefab;
 
-        private GameObject SeperatorPrefab { get => _separatorPrefab; set => _separatorPrefab = value; }
+        public GameObject SeperatorPrefab { get => _separatorPrefab; set => _separatorPrefab = value; }
         [SerializeField] private GameObject _separatorPrefab;
 
         // TODO : add side column prefabs

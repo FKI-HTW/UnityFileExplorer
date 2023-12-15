@@ -22,5 +22,5 @@ MonoBehaviour:
   _chooseFileButtonPrefab: {fileID: 4209207891914893309, guid: e21d9861058e6a54a8a2b54aee29610a, type: 3}
   _noFilesInfoPrefab: {fileID: 4921745232775827764, guid: fca2149f8bf745d4fbc0e76f53849d6f, type: 3}
   _pathContainerPrefab: {fileID: 6619407280121313472, guid: 8746961f873919443a52da96cd1aabba, type: 3}
-  _folderButtonPrefab: {fileID: 0}
-  _separatorPrefab: {fileID: 0}
+  _folderButtonPrefab: {fileID: 4209207891914893309, guid: b5649efefca8004438c2e42c1eb0139a, type: 3}
+  _separatorPrefab: {fileID: 1421397114823043248, guid: 35a9b1ee2a4e93342bfbd75db8c3a7b0, type: 3}
