@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3045904a3eb7ac4c929f1591635dc60, type: 3}
   m_Name: DefaultFileExplorerConfiguration
   m_EditorClassIdentifier: 
+  _upperUIBar: {fileID: 6619407280121313472, guid: 96b57a2848b121a43a28f4da99efc140, type: 3}
   _folderPrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
   _filePrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
   _arrowBackPrefab: {fileID: 4209207891914893309, guid: 5832582facf4a0e4da93323b205925ac, type: 3}
@@ -20,3 +21,6 @@ MonoBehaviour:
   _cancelButtonPrefab: {fileID: 4209207891914893309, guid: 2d5478437fc4a784c8ea366a5ca84e61, type: 3}
   _chooseFileButtonPrefab: {fileID: 4209207891914893309, guid: e21d9861058e6a54a8a2b54aee29610a, type: 3}
   _noFilesInfoPrefab: {fileID: 4921745232775827764, guid: fca2149f8bf745d4fbc0e76f53849d6f, type: 3}
+  _pathContainerPrefab: {fileID: 6619407280121313472, guid: 8746961f873919443a52da96cd1aabba, type: 3}
+  _folderButtonPrefab: {fileID: 0}
+  _separatorPrefab: {fileID: 0}

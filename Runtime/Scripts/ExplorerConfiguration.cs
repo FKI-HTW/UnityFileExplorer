@@ -8,6 +8,9 @@ namespace CENTIS.UnityFileExplorer
     [CreateAssetMenu(fileName = "new FileExplorerConfiguration", menuName = "CENTIS/UnityFileExplorer")]
     public class ExplorerConfiguration : ScriptableObject
     {
+        public GameObject UpperUIBar { get => _upperUIBar; set => _upperUIBar = value; }
+        [SerializeField] private GameObject _upperUIBar;
+
         public UINode FolderPrefab { get => _folderPrefab; set => _folderPrefab = value; }
         [SerializeField] private UINode _folderPrefab;
 
@@ -32,10 +35,17 @@ namespace CENTIS.UnityFileExplorer
         public GameObject NoFilesInfo { get => _noFilesInfoPrefab; set => _noFilesInfoPrefab = value; }
         [SerializeField] private GameObject _noFilesInfoPrefab;
 
+        // folder path prefabs
+        public GameObject PathContainerPrefab { get => _pathContainerPrefab; set => _pathContainerPrefab = value; }
+        [SerializeField] private GameObject _pathContainerPrefab;
+
+        private Button FolderButtonPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
+        [SerializeField] private Button _folderButtonPrefab; 
+
+        private GameObject SeperatorPrefab { get => _separatorPrefab; set => _separatorPrefab = value; }
+        [SerializeField] private GameObject _separatorPrefab;
 
         // TODO : add side column prefabs
-
-        // TODO : add folder path prefabs
 
         // TODO : add top bar/bottom bar that contains folder path and buttons?
     }
