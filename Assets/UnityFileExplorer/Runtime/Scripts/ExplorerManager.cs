@@ -60,9 +60,11 @@ namespace CENTIS.UnityFileExplorer
         {
 			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
 			_backButton.onClick.AddListener(GoBack);
+			_backButton.interactable = false;
 			
 			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform); 
 			_forwardButton.onClick.AddListener(GoForward);
+			_forwardButton.interactable = false;
 
 			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _upperUIBar.transform); 
 			_cancelButton.onClick.AddListener(CancelFindFile);
@@ -158,6 +160,12 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
+			_forwardButton.interactable = true;
+
+			if(_lastVisitedNodes.Count == 0)
+            {
+				_backButton.interactable = false;
+			}
 		}
 
 		public void GoForward()
@@ -170,6 +178,12 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
+			_backButton.interactable = true;
+
+			if(_lastReturnedFromNodes.Count == 0)
+            {
+				_forwardButton.interactable = false;
+			}
 		}
 
 		#endregion
@@ -194,7 +208,8 @@ namespace CENTIS.UnityFileExplorer
 			}
 			node.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
-			_lastReturnedFromNodes.Clear();
+			_backButton.interactable = true;
+			_lastReturnedFromNodes.Clear(); //TO DO - understand why list is cleared here *****
 			_currentFolder = node;
 		}
 
