@@ -19,13 +19,11 @@ namespace CENTIS.UnityFileExplorer
 
 		private SerializedProperty _explorerConfig;
 		private SerializedProperty _fileContainer;
-		private SerializedProperty _upperUIBar;
 
 		public void OnEnable()
 		{
 			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration");
 			_fileContainer = serializedObject.FindProperty("_fileContainer");
-			_upperUIBar = serializedObject.FindProperty("_upperUIBar");
 
 			if (_explorerConfig.objectReferenceValue == null)
 			{
@@ -47,7 +45,6 @@ namespace CENTIS.UnityFileExplorer
 			}
 
 			EditorGUILayout.PropertyField(_fileContainer);
-			EditorGUILayout.PropertyField(_upperUIBar);
 
 			serializedObject.ApplyModifiedProperties();
 		}

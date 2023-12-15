@@ -24,9 +24,6 @@ namespace CENTIS.UnityFileExplorer
 		}
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
 
-		public GameObject UpperUIBar { get => _upperUIBar; }
-		[SerializeField] private GameObject _upperUIBar;
-
 		public GameObject FileContainer { get => _fileContainer; }
 		[SerializeField] private GameObject _fileContainer;
 
@@ -44,12 +41,19 @@ namespace CENTIS.UnityFileExplorer
 		private string _fileExtension;
 		private bool _certainFilesOnly = false;
 
+		private GameObject _upperUIBar;
 		private Button _exitButton;
 		private Button _backButton;
 		private Button _forwardButton;
 		private Button _cancelButton;
 		private Button _confirmChoiceButton;
 		private GameObject _noFilesInfoPrefab;
+
+		private GameObject _pathContainerPrefab;
+		private Button _folderButtonPrefab;
+		private GameObject _separatorPrefab;
+
+		private string _currentFolderPath; //check if needed or if _currentFolder can be used
 
 		#endregion
 
@@ -63,6 +67,8 @@ namespace CENTIS.UnityFileExplorer
 
 		public void LoadCustomPrefabs()
         {
+			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _fileContainer.transform);
+
 			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
 			_backButton.onClick.AddListener(GoBack);
 			_backButton.interactable = false;
@@ -80,7 +86,9 @@ namespace CENTIS.UnityFileExplorer
 			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform); 
 			_exitButton.onClick.AddListener(CancelFindFile);
 
-			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _fileContainer.transform); //To do - check if this is right transform
+			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _fileContainer.transform);
+
+			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _fileContainer.transform);
 			_noFilesInfoPrefab.SetActive(false);
 		}
 
