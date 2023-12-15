@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System;
+using System.Security.AccessControl;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -40,6 +41,9 @@ namespace CENTIS.UnityFileExplorer
 
 		private Action<string> _fileFoundCallback;
 
+		private string _fileExtension;
+		private bool _certainFilesOnly = false;
+
 		private Button _exitButton;
 		private Button _backButton;
 		private Button _forwardButton;
@@ -52,7 +56,7 @@ namespace CENTIS.UnityFileExplorer
 		private void Start()
 		{
 			LoadCustomPrefabs();
-			FindFile(onFilePathFound: Debug.Log); // for testing
+			FindFile(onFilePathFound: Debug.Log, null, ".dll"); // for testing
 		}
 
 		#region public methods
@@ -85,6 +89,11 @@ namespace CENTIS.UnityFileExplorer
 			Environment.SpecialFolder? startFolder = null,
 			string fileExtension = ""
         ){
+			if (!fileExtension.Equals(""))
+			{
+				_fileExtension = fileExtension;
+				_certainFilesOnly = true;
+			}
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, null, null);
 
@@ -111,7 +120,7 @@ namespace CENTIS.UnityFileExplorer
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode);
-			_currentFolder = startNode;
+			_currentFolder = startNode;			
 			startNode.NavigateTo();
 		}
 
@@ -199,8 +208,11 @@ namespace CENTIS.UnityFileExplorer
 		{
 			// TODO : use a better check like Directory.GetAccessControl to check for Access Permission
 			try {
+				//DirectoryInfo directoryInfo = Directory.CreateDirectory(node.ToString());
+				//DirectorySecurity directorySec = Directory.GetAccessControl(node.ToString(),2);
+				//System.Security.AccessControl.DirectorySecurity secInfo = directoryInfo.GetAccessControl();
 				IsFolderLoaded(node);
-            } catch (UnauthorizedAccessException) {
+			} catch (UnauthorizedAccessException) {
 				node.MissingPermissions();
 				return;
             }
@@ -254,9 +266,22 @@ namespace CENTIS.UnityFileExplorer
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
 			foreach (FileInfo file in containedFiles)
 			{
-				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
-				folder.AddChild(fileNode);
-				_hashedNodes.Add(fileNode);
+				if (_certainFilesOnly)
+				{
+					string fileInfo = file.Name; //string sieht aus wie dateiname.fileendung(.weitereFileEndungManchmal)
+					if (fileInfo.EndsWith(_fileExtension))
+					{
+						FileNode fileNode = new(this, file.GetNodeInformation(), folder);
+						folder.AddChild(fileNode);
+						_hashedNodes.Add(fileNode);
+					}
+				}
+				else
+				{
+					FileNode fileNode = new(this, file.GetNodeInformation(), folder);
+					folder.AddChild(fileNode);
+					_hashedNodes.Add(fileNode);
+				}
 			}
 		}
 
