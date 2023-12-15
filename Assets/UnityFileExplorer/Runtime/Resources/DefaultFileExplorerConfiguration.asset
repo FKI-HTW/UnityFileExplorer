@@ -19,3 +19,4 @@ MonoBehaviour:
   _exitButtonPrefab: {fileID: 9130513981467502345, guid: 3bb5e3aac15750b4a87f4e5c98fc09a3, type: 3}
   _cancelButtonPrefab: {fileID: 4209207891914893309, guid: 2d5478437fc4a784c8ea366a5ca84e61, type: 3}
   _chooseFileButtonPrefab: {fileID: 4209207891914893309, guid: e21d9861058e6a54a8a2b54aee29610a, type: 3}
+  _noFilesInfoPrefab: {fileID: 4921745232775827764, guid: fca2149f8bf745d4fbc0e76f53849d6f, type: 3}

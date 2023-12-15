@@ -29,11 +29,14 @@ namespace CENTIS.UnityFileExplorer
         public Button ChooseFileButtonPrefab { get => _chooseFileButtonPrefab; set => _chooseFileButtonPrefab = value; }
         [SerializeField] private Button _chooseFileButtonPrefab;
 
+        public GameObject NoFilesInfo { get => _noFilesInfoPrefab; set => _noFilesInfoPrefab = value; }
+        [SerializeField] private GameObject _noFilesInfoPrefab;
 
-		// TODO : add side column prefabs
 
-		// TODO : add folder path prefabs
+        // TODO : add side column prefabs
+
+        // TODO : add folder path prefabs
 
         // TODO : add top bar/bottom bar that contains folder path and buttons?
-	}
+    }
 }

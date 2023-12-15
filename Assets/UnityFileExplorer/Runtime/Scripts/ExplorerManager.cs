@@ -45,6 +45,7 @@ namespace CENTIS.UnityFileExplorer
 		private Button _forwardButton;
 		private Button _cancelButton;
 		private Button _confirmChoiceButton;
+		private GameObject _noFilesInfoPrefab;
 
 		#endregion
 
@@ -74,6 +75,9 @@ namespace CENTIS.UnityFileExplorer
 
 			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform); 
 			_exitButton.onClick.AddListener(CancelFindFile);
+
+			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _fileContainer.transform); //To do - check if this is right transform
+			_noFilesInfoPrefab.SetActive(false);
 		}
 
 		public void FindFile(
@@ -160,6 +164,7 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
+			_noFilesInfoPrefab.SetActive(false);
 			_forwardButton.interactable = true;
 
 			if(_lastVisitedNodes.Count == 0)
@@ -211,6 +216,10 @@ namespace CENTIS.UnityFileExplorer
 			_backButton.interactable = true;
 			_lastReturnedFromNodes.Clear(); //TO DO - understand why list is cleared here *****
 			_currentFolder = node;
+			if (_currentFolder.Children.Count == 0)
+			{
+				_noFilesInfoPrefab.SetActive(true); //To do - deactivate info when gone back
+			}
 		}
 
 		private void ChooseFile(FileNode node)
