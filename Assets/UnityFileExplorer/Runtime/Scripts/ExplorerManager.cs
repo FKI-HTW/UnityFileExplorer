@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System;
-using System.Security.AccessControl;
+using TMPro;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -50,8 +50,23 @@ namespace CENTIS.UnityFileExplorer
 		private GameObject _noFilesInfoPrefab;
 
 		private GameObject _pathContainerPrefab;
-		private Button _folderButtonPrefab;
-		private GameObject _separatorPrefab;
+		private Button _folderButtonOne;
+		private TextMeshProUGUI _folderButtonOneText;
+		private Button _folderButtonTwo;
+		private TextMeshProUGUI _folderButtonTwoText;
+		private Button _folderButtonThree;
+		private TextMeshProUGUI _folderButtonThreeText;
+		private Button _folderButtonFour;
+		private TextMeshProUGUI _folderButtonFourText;
+		private Button _folderButtonFive;
+		private TextMeshProUGUI _folderButtonFiveText;
+
+		private GameObject _separatorOne;
+		private GameObject _separatorTwo;
+		private GameObject _separatorThree;
+		private GameObject _separatorFour;
+		private GameObject _separatorFive;
+		private GameObject _separatorSix;
 
 		private string _currentFolderPath; //check if needed or if _currentFolder can be used
 
@@ -87,6 +102,7 @@ namespace CENTIS.UnityFileExplorer
 			_exitButton.onClick.AddListener(CancelFindFile);
 
 			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _fileContainer.transform);
+			InstatiatePathPrefabs();
 
 			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _fileContainer.transform);
 			_noFilesInfoPrefab.SetActive(false);
@@ -214,11 +230,56 @@ namespace CENTIS.UnityFileExplorer
 
 		#region private methods
 
+		private void InstatiatePathPrefabs()
+        {
+			_separatorOne = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			// 1 ***
+			_folderButtonOne = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			_folderButtonOneText = _folderButtonOne.GetComponentInChildren<TextMeshProUGUI>();
+			_folderButtonOneText.SetText("This Computer");
+			_folderButtonOne.onClick.AddListener(() => OnFolderButtonClick(_folderButtonOneText.text)); // check if this is best solution
+
+			_separatorTwo = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			// 2 ***
+			_folderButtonTwo = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			_folderButtonTwoText = _folderButtonTwo.GetComponentInChildren<TextMeshProUGUI>();
+			_folderButtonTwo.onClick.AddListener(() => OnFolderButtonClick(_folderButtonTwoText.text));
+			_folderButtonTwo.gameObject.SetActive(false);
+
+			_separatorThree = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			_separatorThree.SetActive(false);
+			// 3 ***
+			_folderButtonThree = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			_folderButtonThreeText = _folderButtonThree.GetComponentInChildren<TextMeshProUGUI>();
+			_folderButtonThree.onClick.AddListener(() => OnFolderButtonClick(_folderButtonThreeText.text));
+			_folderButtonThree.gameObject.SetActive(false);
+
+			_separatorFour = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			_separatorFour.SetActive(false);
+			// 4 ***
+			_folderButtonFour = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			_folderButtonFourText = _folderButtonFour.GetComponentInChildren<TextMeshProUGUI>();
+			_folderButtonFour.onClick.AddListener(() => OnFolderButtonClick(_folderButtonFourText.text));
+			_folderButtonFour.gameObject.SetActive(false);
+
+			_separatorFive = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			_separatorFive.SetActive(false);
+			// 5 ***
+			_folderButtonFive = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
+			_folderButtonFiveText = _folderButtonFive.GetComponentInChildren<TextMeshProUGUI>();
+			_folderButtonFive.onClick.AddListener(() => OnFolderButtonClick(_folderButtonFiveText.text)); 
+			_folderButtonFive.gameObject.SetActive(false);
+
+			_separatorSix = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
+			_separatorSix.SetActive(false);
+		}
+
 		private void UpdateFolderPath(string currentFolderPath)
 		{
 			ClearPath();
-			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar);
-
+			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar); //char is backslash on windows and slash on mac
+			//To do: dont instantiate path buttons and seperators every time path changes,
+            // instead have a max. amount of folders visible in path and change text on the buttons according to changing path
 			foreach (string folder in folders)
 			{
 				CreateFolderButton(folder);
