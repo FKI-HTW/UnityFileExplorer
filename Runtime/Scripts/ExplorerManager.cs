@@ -181,8 +181,8 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
 			_lastReturnedFromNodes.Add(_currentFolder);
-			UpdateFolderPath(targetNode.ToString()); //find right path to pass
 			_currentFolder = targetNode;
+			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - error -> not set to an instance of an object.. 
 			_noFilesInfoPrefab.SetActive(false);
 			_forwardButton.interactable = true;
 
@@ -201,7 +201,7 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
-			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass
+			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - error -> not set to an instance of an object.. 
 			_currentFolder = targetNode;
 			_backButton.interactable = true;
 
@@ -265,10 +265,10 @@ namespace CENTIS.UnityFileExplorer
 		{
 			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
 
-			//todo - save _startFolderName as first string in folders[]
+			//todo - save _startFolderName as first string in folders[] and check split operation - not working properly yet
 			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar); //char is backslash on windows and slash on mac
 
-			if (folders.Length <= 5)
+			if (folders.Length <= _folderButtons.Length)
 			{
 				for (int i = 0; i < folders.Length; i++)
 				{
@@ -332,6 +332,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				_noFilesInfoPrefab.SetActive(true);
 			}
+			UpdateFolderPath(node.ToString());
 		}
 
 		private void ChooseFile(FileNode node)
