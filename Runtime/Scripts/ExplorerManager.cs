@@ -68,43 +68,12 @@ namespace CENTIS.UnityFileExplorer
 
 		#region public methods
 
-		public void LoadCustomPrefabs()
-        {
-			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
-			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
-			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
-			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
-			
-
-			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
-			_backButton.onClick.AddListener(GoBack);
-			_backButton.interactable = false;
-			
-			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform); 
-			_forwardButton.onClick.AddListener(GoForward);
-			_forwardButton.interactable = false;
-
-			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
-			_exitButton.onClick.AddListener(CancelFindFile);
-
-			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform); 
-			_cancelButton.onClick.AddListener(CancelFindFile);
-
-			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform); 
-			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
-
-			InstatiatePathPrefabs();
-
-			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
-			_noFilesInfoPrefab.SetActive(false);
-		}
-
 		public void FindFile(
 			Action<string> onFilePathFound = null,
 			Environment.SpecialFolder? startFolder = null,
-			string fileExtension = ""
+			string fileExtension = null
         ){
-			if (!fileExtension.Equals(""))
+			if (!string.IsNullOrEmpty(fileExtension))
 			{
 				_fileExtension = fileExtension;
 				_certainFilesOnly = true;
@@ -143,6 +112,37 @@ namespace CENTIS.UnityFileExplorer
 		{
 			_fileFoundCallback = null;
 			// TODO : close window ?
+		}
+
+		public void LoadCustomPrefabs()
+        {
+			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
+			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
+			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
+			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
+			
+
+			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
+			_backButton.onClick.AddListener(GoBack);
+			_backButton.interactable = false;
+			
+			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform); 
+			_forwardButton.onClick.AddListener(GoForward);
+			_forwardButton.interactable = false;
+
+			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
+			_exitButton.onClick.AddListener(CancelFindFile);
+
+			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform); 
+			_cancelButton.onClick.AddListener(CancelFindFile);
+
+			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform); 
+			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+
+			InstatiatePathPrefabs();
+
+			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
+			_noFilesInfoPrefab.SetActive(false);
 		}
 
 		public void SelectNode(TreeNode node)
@@ -185,14 +185,13 @@ namespace CENTIS.UnityFileExplorer
 			VirtualFolderNode targetNode = _lastVisitedNodes[^1];
 			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
 			_currentFolder.NavigateFrom();
-			targetNode.NavigateTo();
-			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
-			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
-			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0 
-				? true 
-				: false); 
+			_currentFolder.NavigateTo();
+			_lastReturnedFromNodes.Add(_currentFolder);
 			_forwardButton.interactable = true;
+
+			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
+			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
 			if (_lastVisitedNodes.Count == 0)
             {
 				_backButton.interactable = false;
@@ -206,13 +205,11 @@ namespace CENTIS.UnityFileExplorer
 			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
 			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
 			_currentFolder.NavigateFrom();
-			targetNode.NavigateTo();
-			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
+			_currentFolder.NavigateTo();
+			_lastVisitedNodes.Add(_currentFolder);
 			UpdateFolderPath(_currentFolder.ToString());
-			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0 
-				? true 
-				: false);
+			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
 			_backButton.interactable = true;
 			if(_lastReturnedFromNodes.Count == 0)
             {
@@ -292,28 +289,26 @@ namespace CENTIS.UnityFileExplorer
 					_folderButtons[i].gameObject.SetActive(false);
 					_separators[i + 1].SetActive(false);
 				}
+				return;
 			}
-            //case path has more folderNames than folder buttons -> just name buttons backwards with folder names 'deepest' in file structure
-            else
-            {
-				int j = 1;
-				for (int i = 4; i >= 0; i--)
-				{
-					_folderButtonTexts[i].SetText(ShortenFilenames(folders[folders.Length - j]));
-					_folderButtons[i].gameObject.SetActive(true);
-					_separators[i + 1].SetActive(true);
-					j++;
-				}
+
+			//case path has more folderNames than folder buttons -> just name buttons backwards with folder names 'deepest' in file structure
+			int j = 1;
+			for (int i = 4; i >= 0; i--)
+			{
+				_folderButtonTexts[i].SetText(ShortenFilenames(folders[^j]));
+				_folderButtons[i].gameObject.SetActive(true);
+				_separators[i + 1].SetActive(true);
+				j++;
 			}
 		}
 
 		private string ShortenFilenames(string inputFolderName)
         {
 			int maxLength = 14;
-			if (inputFolderName.Length > maxLength)
-			{
-				return inputFolderName.Substring(0, maxLength - 3) + "...";
-			} else { return inputFolderName; }
+			return inputFolderName.Length > maxLength
+					? $"{inputFolderName[..(maxLength - 3)]}..."
+					: inputFolderName;
 		}
 
 		private void OnFolderButtonClick(string folderName) //TODO
@@ -327,7 +322,7 @@ namespace CENTIS.UnityFileExplorer
 
 			FolderNode destinationNode = null;
 			//VirtualFolderNode foundNode = null; **ohne linq
-		   VirtualFolderNode foundNode = _lastVisitedNodes.FirstOrDefault(node => node.Info.Name == folderName); //NullPointer - not set to an instance of an obeject
+			VirtualFolderNode foundNode = _lastVisitedNodes.FirstOrDefault(node => node.Info.Name.Equals(folderName)); //NullPointer - not set to an instance of an obeject
 
 			/*ohne linq:
 			 * 
@@ -346,7 +341,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				destinationNode = FindParentRecursive(new DirectoryInfo(foundNode.ToString()));
 			}
-			if(destinationNode != null)
+			if (destinationNode != null)
             {
 				NavigateToNode(destinationNode);
 				UpdateFolderPath(destinationNode.ToString());
@@ -365,17 +360,20 @@ namespace CENTIS.UnityFileExplorer
 				return;
             }
 
-			_currentFolder.NavigateFrom();
 			if (!IsFolderLoaded(node))
 			{
 				AddDirectories(node);
 				AddFiles(node);
 			}
-			node.NavigateTo();
-			_lastVisitedNodes.Add(_currentFolder);
-			_backButton.interactable = true;
-			_lastReturnedFromNodes.Clear(); //TO DO - understand why list is cleared here ***** FRAGE AN JULIAN *****
+
+			_currentFolder.NavigateFrom();
 			_currentFolder = node;
+			_currentFolder.NavigateTo();
+
+			_lastVisitedNodes.Add(_currentFolder);
+			_lastReturnedFromNodes.Clear();
+			_backButton.interactable = true;
+
 			if (_currentFolder.Children.Count == 0)
 			{
 				_noFilesInfoPrefab.SetActive(true);
@@ -415,22 +413,12 @@ namespace CENTIS.UnityFileExplorer
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
 			foreach (FileInfo file in containedFiles)
 			{
-				if (_certainFilesOnly)
-				{
-					string fileInfo = file.Name;
-					if (fileInfo.EndsWith(_fileExtension))
-					{
-						FileNode fileNode = new(this, file.GetNodeInformation(), folder);
-						folder.AddChild(fileNode);
-						_hashedNodes.Add(fileNode);
-					}
-				}
-				else
-				{
-					FileNode fileNode = new(this, file.GetNodeInformation(), folder);
-					folder.AddChild(fileNode);
-					_hashedNodes.Add(fileNode);
-				}
+				string fileInfo = file.Name;
+				if (_certainFilesOnly && !fileInfo.EndsWith(_fileExtension)) continue;
+
+				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
+				folder.AddChild(fileNode);
+				_hashedNodes.Add(fileNode);
 			}
 		}
 
