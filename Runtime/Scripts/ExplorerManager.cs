@@ -265,8 +265,8 @@ namespace CENTIS.UnityFileExplorer
 		{
 			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
 
-			//todo - save _startFolderName as first string in folders[] and check split operation - not working properly yet
-			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar); //char is backslash on windows and slash on mac
+			Debug.Log(currentFolderPath); //todo remove when all works properly
+			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar, '/'); //char is backslash on windows and slash on mac
 
 			if (folders.Length <= _folderButtons.Length)
 			{
