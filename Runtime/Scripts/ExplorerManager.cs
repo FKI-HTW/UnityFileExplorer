@@ -202,7 +202,7 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
-			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - nullPointer -> not set to an instance of an object.. 
+			UpdateFolderPath(_currentFolder.ToString());
 			_backButton.interactable = true;
 			if(_lastReturnedFromNodes.Count == 0)
             {
