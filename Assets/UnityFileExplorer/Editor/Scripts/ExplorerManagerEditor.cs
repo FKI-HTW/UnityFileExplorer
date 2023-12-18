@@ -18,12 +18,12 @@ namespace CENTIS.UnityFileExplorer
 		}
 
 		private SerializedProperty _explorerConfig;
-		private SerializedProperty _fileContainer;
+		private SerializedProperty _canvas;
 
 		public void OnEnable()
 		{
 			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration");
-			_fileContainer = serializedObject.FindProperty("_fileContainer");
+			_canvas = serializedObject.FindProperty("_canvas");
 
 			if (_explorerConfig.objectReferenceValue == null)
 			{
@@ -44,7 +44,7 @@ namespace CENTIS.UnityFileExplorer
 				EditorGUI.indentLevel--;
 			}
 
-			EditorGUILayout.PropertyField(_fileContainer);
+			EditorGUILayout.PropertyField(_canvas);
 
 			serializedObject.ApplyModifiedProperties();
 		}
