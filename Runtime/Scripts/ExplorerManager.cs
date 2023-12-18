@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.IO;
 using System;
 using TMPro;
+using System.Linq;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -182,8 +183,7 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
-			UpdateFolderPath(_currentFolder.ToString()); // _current folder is here the node we are navigating to when back is clicked - right?
-                                                         // find right path to pass - nullPointer -> not set to an instance of an object.. 
+			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
 			_noFilesInfoPrefab.SetActive(false);
 			_forwardButton.interactable = true;
 			if (_lastVisitedNodes.Count == 0)
@@ -225,7 +225,7 @@ namespace CENTIS.UnityFileExplorer
 			_folderButtons[0] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
 			_folderButtonTexts[0] = _folderButtons[0].GetComponentInChildren<TextMeshProUGUI>();
 			_folderButtonTexts[0].SetText(_startFolderName);
-			_folderButtons[0].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[0].text)); // check if this is best solution
+			_folderButtons[0].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[0].text)); // check if this works
 
 			_separators[1] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
 			// 2 ***
@@ -310,12 +310,43 @@ namespace CENTIS.UnityFileExplorer
 		{
 			Debug.Log($"Navigate to: {folderName}");
 
-			// this path needs to be the currentFolderPath up to the clicked folder -> update lists of lastVisisted etc. 
-			//newFolderPath = Path.Combine(currentFolderPath, folderName); //this nonsense needs to be updated
-			//UpdateFolderPath(newFolderPath);
+			//Frage ist, wie definieren wir den "Sprung" zu einem Ordner ? als select und zu ordner springen, also als gesprungenes forward quasi? 
+			// oder als back in den unter back gespeicherten ordnern im verlauf gehen? (der user kann im verlauf ja aber 3 mal an dem ordner angekommen sein,
+			//	der nun direkt angeklickt wurde, welchen nimmt man dann? 
+			// -> conclusion: jump zum ordner:
+
+			FolderNode destinationNode = null;
+			//VirtualFolderNode foundNode = null; **ohne linq
+		   VirtualFolderNode foundNode = _lastVisitedNodes.FirstOrDefault(node => node.Info.Name == folderName); //NullPointer - not set to an instance of an obeject
+
+			/*ohne linq:
+			 * 
+			 * 
+			
+			foreach (VirtualFolderNode node in _lastVisitedNodes)
+			{
+				if (node.Info.Name == folderName)
+				{
+					foundNode = node;
+					break;
+				}
+			}*/
+
+			if (foundNode != null)
+			{
+				destinationNode = FindParentRecursive(new DirectoryInfo(foundNode.ToString()));
+			}
+			if(destinationNode != null)
+            {
+				NavigateToNode(destinationNode);
+				UpdateFolderPath(destinationNode.ToString());
+				return;
+			}
+			Debug.Log("Did not find clicked Node.");
+
 		}
 
-		private void NavigateToNode(VirtualFolderNode node)
+				private void NavigateToNode(VirtualFolderNode node)
 		{
 			try {
 				IsFolderLoaded(node);
@@ -333,7 +364,7 @@ namespace CENTIS.UnityFileExplorer
 			node.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
 			_backButton.interactable = true;
-			_lastReturnedFromNodes.Clear(); //TO DO - understand why list is cleared here *****
+			_lastReturnedFromNodes.Clear(); //TO DO - understand why list is cleared here ***** FRAGE AN JULIAN *****
 			_currentFolder = node;
 			if (_currentFolder.Children.Count == 0)
 			{
