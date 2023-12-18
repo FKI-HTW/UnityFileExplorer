@@ -263,7 +263,6 @@ namespace CENTIS.UnityFileExplorer
 
 		//Todo:
         //- handle foldernames with more signs than button can show
-        //- add virtual root folder to current folder path string as start folder this pc
 
 		private void UpdateFolderPath(string currentFolderPath)
 		{
@@ -276,7 +275,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				for (int i = 0; i < folders.Length; i++)
 				{
-					_folderButtonTexts[i].SetText(folders[i]);
+					_folderButtonTexts[i].SetText(ShortenFilenames(folders[i]));
 					_folderButtons[i].gameObject.SetActive(true);
 					_separators[i + 1].SetActive(true);
 				}
@@ -294,12 +293,21 @@ namespace CENTIS.UnityFileExplorer
 				int j = 1;
 				for (int i = 4; i >= 0; i--)
 				{
-					_folderButtonTexts[i].SetText(folders[folders.Length - j]);
+					_folderButtonTexts[i].SetText(ShortenFilenames(folders[folders.Length - j]));
 					_folderButtons[i].gameObject.SetActive(true);
 					_separators[i + 1].SetActive(true);
 					j++;
 				}
 			}
+		}
+
+		private string ShortenFilenames(string inputFolderName)
+        {
+			int maxLength = 13;
+			if (inputFolderName.Length > maxLength)
+			{
+				return inputFolderName.Substring(0, maxLength - 3) + "...";
+			} else { return inputFolderName; }
 		}
 
 		private void OnFolderButtonClick(string folderName) //TODO
