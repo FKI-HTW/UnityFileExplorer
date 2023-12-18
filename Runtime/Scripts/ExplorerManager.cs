@@ -261,13 +261,17 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
+		//Todo:
+        //- handle foldernames with more signs than button can show
+        //- add virtual root folder to current folder path string as start folder this pc
+
 		private void UpdateFolderPath(string currentFolderPath)
 		{
 			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
 
+			currentFolderPath = _startFolderName + "/" + currentFolderPath;
 			Debug.Log(currentFolderPath); //todo remove when all works properly
-			string[] folders = currentFolderPath.Split(Path.DirectorySeparatorChar, '/'); //char is backslash on windows and slash on mac
-
+			string[] folders = currentFolderPath.Split(new[] { Path.DirectorySeparatorChar, '/' }, StringSplitOptions.RemoveEmptyEntries);
 			if (folders.Length <= _folderButtons.Length)
 			{
 				for (int i = 0; i < folders.Length; i++)
