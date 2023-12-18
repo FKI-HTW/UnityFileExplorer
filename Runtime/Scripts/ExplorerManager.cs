@@ -56,7 +56,6 @@ namespace CENTIS.UnityFileExplorer
 		private Button[] _folderButtons;
 		private TextMeshProUGUI[] _folderButtonTexts;
 		private GameObject[] _separators;
-		private string _startFolderName = "This PC";
 
 		#endregion
 
@@ -79,7 +78,8 @@ namespace CENTIS.UnityFileExplorer
 				_certainFilesOnly = true;
 			}
 			_fileFoundCallback = onFilePathFound;
-			_root = new VirtualFolderNode(this, null, null);
+			_root = new VirtualFolderNode(this, new() { Name = "This PC/" }, null);
+			InstatiatePathPrefabs(); // TODO : temporary
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -112,37 +112,6 @@ namespace CENTIS.UnityFileExplorer
 		{
 			_fileFoundCallback = null;
 			// TODO : close window ?
-		}
-
-		public void LoadCustomPrefabs()
-        {
-			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
-			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
-			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
-			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
-			
-
-			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
-			_backButton.onClick.AddListener(GoBack);
-			_backButton.interactable = false;
-			
-			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform); 
-			_forwardButton.onClick.AddListener(GoForward);
-			_forwardButton.interactable = false;
-
-			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
-			_exitButton.onClick.AddListener(CancelFindFile);
-
-			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform); 
-			_cancelButton.onClick.AddListener(CancelFindFile);
-
-			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform); 
-			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
-
-			InstatiatePathPrefabs();
-
-			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
-			_noFilesInfoPrefab.SetActive(false);
 		}
 
 		public void SelectNode(TreeNode node)
@@ -184,14 +153,16 @@ namespace CENTIS.UnityFileExplorer
 
 			VirtualFolderNode targetNode = _lastVisitedNodes[^1];
 			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
+			_lastReturnedFromNodes.Add(_currentFolder);
+			
 			_currentFolder.NavigateFrom();
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
-			_lastReturnedFromNodes.Add(_currentFolder);
-			_forwardButton.interactable = true;
 
 			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
 			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
+
+			_forwardButton.interactable = true;
 			if (_lastVisitedNodes.Count == 0)
             {
 				_backButton.interactable = false;
@@ -204,12 +175,14 @@ namespace CENTIS.UnityFileExplorer
 
 			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
 			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
+			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder.NavigateFrom();
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
-			_lastVisitedNodes.Add(_currentFolder);
+
 			UpdateFolderPath(_currentFolder.ToString());
 			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
+
 			_backButton.interactable = true;
 			if(_lastReturnedFromNodes.Count == 0)
             {
@@ -221,6 +194,35 @@ namespace CENTIS.UnityFileExplorer
 
 		#region private methods
 
+		private void LoadCustomPrefabs()
+		{
+			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
+			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
+			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
+			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
+
+
+			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
+			_backButton.onClick.AddListener(GoBack);
+			_backButton.interactable = false;
+
+			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
+			_forwardButton.onClick.AddListener(GoForward);
+			_forwardButton.interactable = false;
+
+			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
+			_exitButton.onClick.AddListener(CancelFindFile);
+
+			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform);
+			_cancelButton.onClick.AddListener(CancelFindFile);
+
+			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform);
+			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+
+			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
+			_noFilesInfoPrefab.SetActive(false);
+		}
+
 		private void InstatiatePathPrefabs()
         {
 			_separators = new GameObject[6];
@@ -231,7 +233,7 @@ namespace CENTIS.UnityFileExplorer
 			// 1 ***
 			_folderButtons[0] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
 			_folderButtonTexts[0] = _folderButtons[0].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtonTexts[0].SetText(_startFolderName);
+			_folderButtonTexts[0].SetText(_root.ToString());
 			_folderButtons[0].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[0].text)); // check if this works
 
 			_separators[1] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
@@ -271,7 +273,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
 
-			currentFolderPath = _startFolderName + "/" + currentFolderPath;
+			currentFolderPath = _root + currentFolderPath;
 			Debug.Log(currentFolderPath); //todo remove when all works properly
 			string[] folders = currentFolderPath.Split(new[] { Path.DirectorySeparatorChar, '/' }, StringSplitOptions.RemoveEmptyEntries);
 			if (folders.Length <= _folderButtons.Length)
@@ -366,13 +368,14 @@ namespace CENTIS.UnityFileExplorer
 				AddFiles(node);
 			}
 
-			_currentFolder.NavigateFrom();
-			_currentFolder = node;
-			_currentFolder.NavigateTo();
-
 			_lastVisitedNodes.Add(_currentFolder);
 			_lastReturnedFromNodes.Clear();
 			_backButton.interactable = true;
+			_forwardButton.interactable = false;
+
+			_currentFolder.NavigateFrom();
+			_currentFolder = node;
+			_currentFolder.NavigateTo();
 
 			if (_currentFolder.Children.Count == 0)
 			{
