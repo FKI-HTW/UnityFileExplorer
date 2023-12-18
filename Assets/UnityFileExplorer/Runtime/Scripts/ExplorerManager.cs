@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using CENTIS.UnityFileExplorer.Datastructure;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 using System;
-using TMPro;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using TMPro;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -51,7 +51,6 @@ namespace CENTIS.UnityFileExplorer
 		private Button _forwardButton;
 		private Button _cancelButton;
 		private Button _confirmChoiceButton;
-		private GameObject _noFilesInfoPrefab;
 
 		private Button[] _folderButtons;
 		private TextMeshProUGUI[] _folderButtonTexts;
@@ -160,7 +159,6 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateTo();
 
 			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
-			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
 
 			_forwardButton.interactable = true;
 			if (_lastVisitedNodes.Count == 0)
@@ -181,7 +179,6 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateTo();
 
 			UpdateFolderPath(_currentFolder.ToString());
-			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0);
 
 			_backButton.interactable = true;
 			if(_lastReturnedFromNodes.Count == 0)
@@ -218,9 +215,6 @@ namespace CENTIS.UnityFileExplorer
 
 			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform);
 			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
-
-			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
-			_noFilesInfoPrefab.SetActive(false);
 		}
 
 		private void InstatiatePathPrefabs()
@@ -356,17 +350,20 @@ namespace CENTIS.UnityFileExplorer
 		private void NavigateToNode(VirtualFolderNode node)
 		{
 			try {
-				IsFolderLoaded(node);
+				if (!IsFolderLoaded(node))
+				{
+					AddDirectories(node);
+					AddFiles(node);
+					if (node.Children == null || node.Children.Count == 0)
+					{
+						EmptyNode emptyNode = new(this, node);
+						node.AddChild(emptyNode);
+					}
+				}
 			} catch (UnauthorizedAccessException) {
 				node.MissingPermissions();
 				return;
             }
-
-			if (!IsFolderLoaded(node))
-			{
-				AddDirectories(node);
-				AddFiles(node);
-			}
 
 			_lastVisitedNodes.Add(_currentFolder);
 			_lastReturnedFromNodes.Clear();
@@ -377,10 +374,6 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = node;
 			_currentFolder.NavigateTo();
 
-			if (_currentFolder.Children.Count == 0)
-			{
-				_noFilesInfoPrefab.SetActive(true);
-			}
 			UpdateFolderPath(node.ToString());
 		}
 
@@ -392,10 +385,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private bool IsFolderLoaded(VirtualFolderNode folder)
 		{
-			string folderPath = folder.ToString();
-			int containedDir = Directory.GetDirectories(folderPath).Length;
-			int containedFiles = Directory.GetFiles(folderPath).Length;
-			return folder.Children.Count >= containedDir + containedFiles;
+			return folder.Children != null;
 		}
 
 		private void AddDirectories(VirtualFolderNode folder)
@@ -414,6 +404,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			string folderPath = folder.ToString();
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
+
 			foreach (FileInfo file in containedFiles)
 			{
 				string fileInfo = file.Name;

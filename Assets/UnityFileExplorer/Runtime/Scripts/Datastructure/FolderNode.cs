@@ -8,7 +8,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 	{
 		public UINode UIInstance { get; private set; }
 
-		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children)
+		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
 			: base(manager, info, parent, children)
 		{
 			UIInstance = GameObject.Instantiate(
@@ -21,9 +21,6 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance.OnActivated += () => manager.ActivateNode(this);
 			UIInstance.Initiate(info);
 		}
-
-		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
-			: this(manager, info, parent, new()) { }
 
 		public bool Equals(FolderNode other)
 		{

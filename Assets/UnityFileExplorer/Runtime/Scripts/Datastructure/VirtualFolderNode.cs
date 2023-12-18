@@ -7,14 +7,11 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 	{
 		public List<TreeNode> Children { get; private set; }
 
-		public VirtualFolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children)
+		public VirtualFolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
 			: base(manager, info, parent)
 		{
 			Children = children;
 		}
-
-		public VirtualFolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
-			: this(manager, info, parent, new()) { }
 
 		public bool Equals(VirtualFolderNode other)
 		{
@@ -46,11 +43,6 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		{ 
 		}
 
-		public void UpdateChildren(List<TreeNode> children)
-		{
-			Children = children;
-		}
-
 		public void AddChild(TreeNode child)
 		{
 			Children ??= new();
@@ -60,7 +52,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public void NavigateTo()
 		{
 			if (Children == null)
-				throw new NotImplementedException("Folder with unloaded children was opened. Implement loading of children on the fly first!");
+				throw new NullReferenceException("Folder with unloaded children was opened.");
 
 			foreach (TreeNode child in Children)
 				child.Show();
@@ -69,7 +61,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public void NavigateFrom()
 		{
 			if (Children == null)
-				throw new NotImplementedException("Folder with unloaded children was opened. Implement loading of children on the fly first!");
+				throw new NullReferenceException("Folder with unloaded children was opened.!");
 
 			foreach (TreeNode child in Children)
 				child.Hide();
