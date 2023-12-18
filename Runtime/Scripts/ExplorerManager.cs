@@ -261,9 +261,6 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
-		//Todo:
-        //- handle foldernames with more signs than button can show
-
 		private void UpdateFolderPath(string currentFolderPath)
 		{
 			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
@@ -303,7 +300,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private string ShortenFilenames(string inputFolderName)
         {
-			int maxLength = 13;
+			int maxLength = 14;
 			if (inputFolderName.Length > maxLength)
 			{
 				return inputFolderName.Substring(0, maxLength - 3) + "...";
