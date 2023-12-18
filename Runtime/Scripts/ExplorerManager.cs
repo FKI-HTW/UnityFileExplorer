@@ -42,7 +42,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private GameObject _upperUIBar;
 		private GameObject _pathContainerPrefab;
-		public GameObject NodeContainerPrefab { get => _nodeContainerPrefab; }
+		public GameObject NodeContainerPrefab => _nodeContainerPrefab;
 		private GameObject _nodeContainerPrefab;
 		private GameObject _bottomUIBar;
 				
@@ -78,7 +78,7 @@ namespace CENTIS.UnityFileExplorer
 			}
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, new() { Name = "This PC/" }, null);
-			InstatiatePathPrefabs(); // TODO : temporary
+			InstantiatePathPrefabs(); // TODO : temporary
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -158,13 +158,10 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
 
-			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
+			UpdateFolderPath(_currentFolder.ToString());
 
 			_forwardButton.interactable = true;
-			if (_lastVisitedNodes.Count == 0)
-            {
-				_backButton.interactable = false;
-			}
+			_backButton.interactable = _lastVisitedNodes.Count != 0;
 		}
 
 		public void GoForward()
@@ -181,10 +178,7 @@ namespace CENTIS.UnityFileExplorer
 			UpdateFolderPath(_currentFolder.ToString());
 
 			_backButton.interactable = true;
-			if(_lastReturnedFromNodes.Count == 0)
-            {
-				_forwardButton.interactable = false;
-			}
+			_forwardButton.interactable = _lastReturnedFromNodes.Count != 0;
 		}
 
 		#endregion
@@ -217,7 +211,7 @@ namespace CENTIS.UnityFileExplorer
 			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
 		}
 
-		private void InstatiatePathPrefabs()
+		private void InstantiatePathPrefabs()
         {
 			_separators = new GameObject[6];
 			_folderButtons = new Button[5];
@@ -344,13 +338,12 @@ namespace CENTIS.UnityFileExplorer
 				return;
 			}
 			Debug.Log("Did not find clicked Node.");
-
 		}
 
 		private void NavigateToNode(VirtualFolderNode node)
 		{
 			try {
-				if (!IsFolderLoaded(node))
+				if (!node.IsFolderLoaded)
 				{
 					AddDirectories(node);
 					AddFiles(node);
@@ -383,11 +376,6 @@ namespace CENTIS.UnityFileExplorer
 			// TODO : close explorer ?
 		}
 
-		private bool IsFolderLoaded(VirtualFolderNode folder)
-		{
-			return folder.Children != null;
-		}
-
 		private void AddDirectories(VirtualFolderNode folder)
 		{
 			string folderPath = folder.ToString();
@@ -404,7 +392,6 @@ namespace CENTIS.UnityFileExplorer
 		{
 			string folderPath = folder.ToString();
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
-
 			foreach (FileInfo file in containedFiles)
 			{
 				string fileInfo = file.Name;
