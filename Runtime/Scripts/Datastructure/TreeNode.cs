@@ -2,7 +2,7 @@ using System;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public abstract class TreeNode : IEquatable<TreeNode>
+	internal abstract class TreeNode : IEquatable<TreeNode>
 	{
 		public ExplorerManager Manager { get; }
 		public NodeInformation Info { get; }
@@ -17,8 +17,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public override string ToString()
 		{
-			if (Info == null) return string.Empty;
-			if (string.IsNullOrEmpty(Info?.Path)) return Info.Name;
+			if (string.IsNullOrEmpty(Info?.Path)) 
+				return Info.Name;
 			return $"{Info.Path}/{Info.Name}";
 		}
 

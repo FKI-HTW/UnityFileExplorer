@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public class FolderNode : VirtualFolderNode, IEquatable<FolderNode>
+	internal class FolderNode : VirtualFolderNode, IEquatable<FolderNode>
 	{
 		public UINode UIInstance { get; private set; }
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public class EmptyNode : TreeNode, IEquatable<EmptyNode>
+	internal class EmptyNode : TreeNode, IEquatable<EmptyNode>
 	{
 		public GameObject UIInstance { get; private set; }
 
