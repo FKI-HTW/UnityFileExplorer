@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8640375766954658803}
   - component: {fileID: 3797874501666855758}
   m_Layer: 5
-  m_Name: PathContainer
+  m_Name: BottomUIBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 5
   m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5700071, g: 0.48971167, b: 0.7169812, a: 1}
+  m_Color: {r: 0.28597364, g: 0.3578249, b: 0.5471698, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

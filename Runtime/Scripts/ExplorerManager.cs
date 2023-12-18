@@ -24,9 +24,7 @@ namespace CENTIS.UnityFileExplorer
 			set => _explorerConfiguration = value; 
 		}
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
-
-		public GameObject FileContainer { get => _fileContainer; }
-		[SerializeField] private GameObject _fileContainer;
+		[SerializeField] private GameObject _canvas;
 
 		private VirtualFolderNode	_root; // a virtual folder above the disks
 		private VirtualFolderNode	_currentFolder;
@@ -43,6 +41,11 @@ namespace CENTIS.UnityFileExplorer
 		private bool _certainFilesOnly = false;
 
 		private GameObject _upperUIBar;
+		private GameObject _pathContainerPrefab;
+		public GameObject NodeContainerPrefab { get => _nodeContainerPrefab; }
+		private GameObject _nodeContainerPrefab;
+		private GameObject _bottomUIBar;
+				
 		private Button _exitButton;
 		private Button _backButton;
 		private Button _forwardButton;
@@ -50,7 +53,6 @@ namespace CENTIS.UnityFileExplorer
 		private Button _confirmChoiceButton;
 		private GameObject _noFilesInfoPrefab;
 
-		private GameObject _pathContainerPrefab;
 		private Button[] _folderButtons;
 		private TextMeshProUGUI[] _folderButtonTexts;
 		private GameObject[] _separators;
@@ -68,7 +70,11 @@ namespace CENTIS.UnityFileExplorer
 
 		public void LoadCustomPrefabs()
         {
-			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _fileContainer.transform);
+			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
+			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
+			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
+			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
+			
 
 			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
 			_backButton.onClick.AddListener(GoBack);
@@ -78,19 +84,18 @@ namespace CENTIS.UnityFileExplorer
 			_forwardButton.onClick.AddListener(GoForward);
 			_forwardButton.interactable = false;
 
-			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _upperUIBar.transform); 
-			_cancelButton.onClick.AddListener(CancelFindFile);
-
-			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _upperUIBar.transform); 
-			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
-
-			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform); 
+			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
 			_exitButton.onClick.AddListener(CancelFindFile);
 
-			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _fileContainer.transform);
+			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform); 
+			_cancelButton.onClick.AddListener(CancelFindFile);
+
+			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform); 
+			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+
 			InstatiatePathPrefabs();
 
-			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _fileContainer.transform);
+			_noFilesInfoPrefab = Instantiate(ExplorerConfiguration.NoFilesInfo, _nodeContainerPrefab.transform);
 			_noFilesInfoPrefab.SetActive(false);
 		}
 
