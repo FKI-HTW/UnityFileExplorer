@@ -184,7 +184,9 @@ namespace CENTIS.UnityFileExplorer
 			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
 			UpdateFolderPath(_currentFolder.ToString()); // nullPointer due to treenode toString() line 20 -> not set to an instance of an object.. 
-			_noFilesInfoPrefab.SetActive(false);
+			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0 
+				? true 
+				: false); 
 			_forwardButton.interactable = true;
 			if (_lastVisitedNodes.Count == 0)
             {
@@ -203,6 +205,9 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
 			UpdateFolderPath(_currentFolder.ToString());
+			_noFilesInfoPrefab.SetActive(_currentFolder.Children.Count == 0 
+				? true 
+				: false);
 			_backButton.interactable = true;
 			if(_lastReturnedFromNodes.Count == 0)
             {
@@ -346,7 +351,7 @@ namespace CENTIS.UnityFileExplorer
 
 		}
 
-				private void NavigateToNode(VirtualFolderNode node)
+		private void NavigateToNode(VirtualFolderNode node)
 		{
 			try {
 				IsFolderLoaded(node);
