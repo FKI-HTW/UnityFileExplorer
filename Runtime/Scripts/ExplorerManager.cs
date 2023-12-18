@@ -53,14 +53,14 @@ namespace CENTIS.UnityFileExplorer
 		private Button[] _folderButtons;
 		private TextMeshProUGUI[] _folderButtonTexts;
 		private GameObject[] _separators;
-		private string _startFolderName = "This PC"; //check if needed or if _currentFolder can be used
+		private string _startFolderName = "This PC";
 
 		#endregion
 
 		private void Start()
 		{
 			LoadCustomPrefabs();
-			FindFile(onFilePathFound: Debug.Log, null, ".dll"); // for testing
+			FindFile(onFilePathFound: Debug.Log, null, ".dll"); // for testing - only showing .dll files at the moment
 		}
 
 		#region public methods
@@ -182,10 +182,10 @@ namespace CENTIS.UnityFileExplorer
 			targetNode.NavigateTo();
 			_lastReturnedFromNodes.Add(_currentFolder);
 			_currentFolder = targetNode;
-			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - error -> not set to an instance of an object.. 
+			UpdateFolderPath(_currentFolder.ToString()); // _current folder is here the node we are navigating to when back is clicked - right?
+                                                         // find right path to pass - nullPointer -> not set to an instance of an object.. 
 			_noFilesInfoPrefab.SetActive(false);
 			_forwardButton.interactable = true;
-
 			if (_lastVisitedNodes.Count == 0)
             {
 				_backButton.interactable = false;
@@ -201,10 +201,9 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateFrom();
 			targetNode.NavigateTo();
 			_lastVisitedNodes.Add(_currentFolder);
-			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - error -> not set to an instance of an object.. 
 			_currentFolder = targetNode;
+			UpdateFolderPath(_currentFolder.ToString()); //find right path to pass - nullPointer -> not set to an instance of an object.. 
 			_backButton.interactable = true;
-
 			if(_lastReturnedFromNodes.Count == 0)
             {
 				_forwardButton.interactable = false;
@@ -309,7 +308,6 @@ namespace CENTIS.UnityFileExplorer
 
 		private void OnFolderButtonClick(string folderName) //TODO
 		{
-			// Handle the folder button click (navigate, load contents, etc.)
 			Debug.Log($"Navigate to: {folderName}");
 
 			// this path needs to be the currentFolderPath up to the clicked folder -> update lists of lastVisisted etc. 

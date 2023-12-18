@@ -47,6 +47,6 @@ namespace CENTIS.UnityFileExplorer
 
         // TODO : add side column prefabs
 
-        // TODO : add top bar/bottom bar that contains folder path and buttons?
+        // TODO : add bottom bar that contains confirm and cancel buttons?
     }
 }
