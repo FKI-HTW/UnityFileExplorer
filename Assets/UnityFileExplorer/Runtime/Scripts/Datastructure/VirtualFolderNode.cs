@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public class VirtualFolderNode : TreeNode, IEquatable<VirtualFolderNode>
+	internal class VirtualFolderNode : TreeNode, IEquatable<VirtualFolderNode>
 	{
 		public List<TreeNode> Children { get; private set; }
 		public bool IsFolderLoaded => Children != null;

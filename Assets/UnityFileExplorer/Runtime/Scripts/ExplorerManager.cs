@@ -113,39 +113,6 @@ namespace CENTIS.UnityFileExplorer
 			// TODO : close window ?
 		}
 
-		public void SelectNode(TreeNode node)
-		{
-			if (node == null) return;
-			if (node.Equals(_selectedNode))
-				ActivateNode(node);
-			else
-				_selectedNode = node;
-		}
-
-		public void DeselectNode(TreeNode node)
-		{
-			if (_selectedNode == node)
-				_selectedNode = null;
-		}
-
-		public void ActivateNode(TreeNode node)
-		{
-			if (node == null) return;
-
-			switch(node)
-			{
-				case FolderNode folderNode:
-					NavigateToNode(folderNode);
-					break;
-				case VirtualFolderNode virtualFolderNode:
-					NavigateToNode(virtualFolderNode);
-					break;
-				case FileNode fileNode:
-					ChooseFile(fileNode);
-					break;
-			}
-		}
-
 		public void GoBack()
 		{
 			if (_lastVisitedNodes.Count == 0) return;
@@ -184,6 +151,39 @@ namespace CENTIS.UnityFileExplorer
 		#endregion
 
 		#region private methods
+
+		internal void SelectNode(TreeNode node)
+		{
+			if (node == null) return;
+			if (node.Equals(_selectedNode))
+				ActivateNode(node);
+			else
+				_selectedNode = node;
+		}
+
+		internal void DeselectNode(TreeNode node)
+		{
+			if (_selectedNode == node)
+				_selectedNode = null;
+		}
+
+		internal void ActivateNode(TreeNode node)
+		{
+			if (node == null) return;
+
+			switch (node)
+			{
+				case FolderNode folderNode:
+					NavigateToNode(folderNode);
+					break;
+				case VirtualFolderNode virtualFolderNode:
+					NavigateToNode(virtualFolderNode);
+					break;
+				case FileNode fileNode:
+					ChooseFile(fileNode);
+					break;
+			}
+		}
 
 		private void LoadCustomPrefabs()
 		{
