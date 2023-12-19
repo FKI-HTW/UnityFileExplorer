@@ -138,6 +138,7 @@ namespace CENTIS.UnityFileExplorer
 			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
 			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
 			_lastVisitedNodes.Add(_currentFolder);
+
 			_currentFolder.NavigateFrom();
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
@@ -182,6 +183,9 @@ namespace CENTIS.UnityFileExplorer
 				case FileNode fileNode:
 					ChooseFile(fileNode);
 					break;
+				case EmptyNode:
+				default:
+					throw new Exception("How did this happen?");
 			}
 		}
 
