@@ -11,10 +11,16 @@
     "keywords": [
         "Unity Package"
     ],
-    "samples": [],
+    "samples": [
+        {
+          "displayName": "Example UI Implementation",
+          "description": "Exmaple prefabs and scriptable object for the File Explorer",
+          "path": "Samples~/ExampleUI"
+        }
+    ],
     "author": {
         "name": "CENTIS HTW-Berlin",
         "email": "centis-htw-bounces@lists.htw-berlin.de",
         "url": "https://fki.htw-berlin.de/centis/"
-      }
+    }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4749705761828359495}
   - component: {fileID: 7821084280514410750}
   - component: {fileID: 705728242837465490}
+  - component: {fileID: 5772832499339244778}
   m_Layer: 5
   m_Name: PathSeperator
   m_TagString: Untagged
@@ -76,6 +77,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5772832499339244778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421397114823043248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b52f3613c49c64e9a0082c396a67ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _name: {fileID: 0}
 --- !u!1 &7801346741337178788
 GameObject:
   m_ObjectHideFlags: 0
