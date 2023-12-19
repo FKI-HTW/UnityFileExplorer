@@ -24,12 +24,6 @@ namespace CENTIS.UnityFileExplorer
 		{
 			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration");
 			_canvas = serializedObject.FindProperty("_canvas");
-
-			if (_explorerConfig.objectReferenceValue == null)
-			{
-				_explorerConfig.objectReferenceValue = (ExplorerConfiguration)Resources.Load("DefaultFileExplorerConfiguration");
-				serializedObject.ApplyModifiedProperties();
-			}
 		}
 
 		public override void OnInspectorGUI()

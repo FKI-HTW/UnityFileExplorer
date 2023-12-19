@@ -13,14 +13,9 @@ namespace CENTIS.UnityFileExplorer
     {
 		#region fields
 
-		public ExplorerConfiguration ExplorerConfiguration 
+		public ExplorerConfiguration ExplorerConfiguration
 		{ 
-			get
-			{
-				if (_explorerConfiguration != null)
-					return _explorerConfiguration;
-				return _explorerConfiguration = (ExplorerConfiguration)Resources.Load("DefaultFileExplorerConfiguration");
-			}
+			get => _explorerConfiguration; 
 			set => _explorerConfiguration = value; 
 		}
         [SerializeField] private ExplorerConfiguration _explorerConfiguration;
