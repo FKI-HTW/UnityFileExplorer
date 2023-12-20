@@ -87,6 +87,7 @@ namespace CENTIS.UnityFileExplorer
 				_fileExtension = fileExtension;
 				_certainFilesOnly = true;
 			}
+
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
 			_hashedNodes.Add(_root);
@@ -200,25 +201,17 @@ namespace CENTIS.UnityFileExplorer
 		// TODO : optimize this
 		private void UpdatePath()
 		{
-			if (PathContainer == null
-				|| PathFolderPrefab == null) 
-				return;
+			if (PathContainer == null || PathFolderPrefab == null) return;
 
 			foreach (PathNode node in _pathNodes)
-			{
 				GameObject.Destroy(node.UIInstance.gameObject);
-			}
 			_pathNodes.Clear();
 
 			VirtualFolderNode folderNode = _currentFolder;
 			while (folderNode != null)
 			{
 				string name = folderNode.Info.Name.Replace("\\", "").Replace("/", "");
-				_pathNodes.Add(new()
-				{
-					FolderNode = folderNode,
-					Name = name,
-				});
+				_pathNodes.Add(new() { FolderNode = folderNode, Name = name });
 				folderNode = folderNode.Parent;
 			}
 
@@ -240,16 +233,16 @@ namespace CENTIS.UnityFileExplorer
 			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
 			_lastReturnedFromNodes.Add(_currentFolder);
 
+			if (ArrowForwardButton != null)
+				ArrowForwardButton.interactable = true;
+			if (ArrowBackButton != null)
+				ArrowBackButton.interactable = _lastVisitedNodes.Count != 0;
+
 			_currentFolder.NavigateFrom();
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
 
 			UpdatePath();
-
-			if (ArrowForwardButton != null)
-				ArrowForwardButton.interactable = true;
-			if (ArrowBackButton != null)
-				ArrowBackButton.interactable = _lastVisitedNodes.Count != 0;
 		}
 
 		private void GoForward()
@@ -260,16 +253,16 @@ namespace CENTIS.UnityFileExplorer
 			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
 			_lastVisitedNodes.Add(_currentFolder);
 
+			if (ArrowBackButton != null)
+				ArrowBackButton.interactable = true;
+			if (ArrowForwardButton != null)
+				ArrowForwardButton.interactable = _lastReturnedFromNodes.Count != 0;
+
 			_currentFolder.NavigateFrom();
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
 
 			UpdatePath();
-
-			if (ArrowBackButton != null)
-				ArrowBackButton.interactable = true;
-			if (ArrowForwardButton != null)
-				ArrowForwardButton.interactable = _lastReturnedFromNodes.Count != 0;
 		}
 
 		private void NavigateToNode(VirtualFolderNode node)
@@ -328,8 +321,7 @@ namespace CENTIS.UnityFileExplorer
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
 			foreach (FileInfo file in containedFiles)
 			{
-				string fileInfo = file.Name;
-				if (_certainFilesOnly && !fileInfo.EndsWith(_fileExtension)) continue;
+				if (_certainFilesOnly && !file.Name.EndsWith(_fileExtension)) continue;
 
 				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
 				folder.AddChild(fileNode);
