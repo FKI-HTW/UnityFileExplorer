@@ -8,7 +8,7 @@ public class Node : UINode
 
 	public override void Initialize(NodeInformation info)
 	{
-		_name.text = info.Name;
+		_name.text = gameObject.name = info.Name;
 	}
 
 	public override void MissingPermissions()
