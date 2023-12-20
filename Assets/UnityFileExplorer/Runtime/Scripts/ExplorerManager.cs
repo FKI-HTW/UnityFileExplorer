@@ -265,6 +265,7 @@ namespace CENTIS.UnityFileExplorer
 				PathNode node = _pathNodes[i];
 				UIPathFolder uiInstance = Instantiate(ExplorerConfiguration.PathFolderPrefab, _pathContainerPrefab.transform);
 				uiInstance.Initialize(node.Name);
+				uiInstance.OnActivated += () => ActivateNode(node.FolderNode);
 				node.UIInstance = uiInstance;
 			}
 		}
