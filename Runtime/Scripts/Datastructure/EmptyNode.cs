@@ -11,8 +11,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			: base(manager, null, parent)
 		{
 			UIInstance = GameObject.Instantiate(
-				manager.ExplorerConfiguration.NoFilesInfo,
-				manager.NodeContainerPrefab.transform);
+				manager.EmptyFolderPrefab,
+				manager.NodeContainer.transform);
 			UIInstance.name = ToString();
 			UIInstance.SetActive(false);
 		}

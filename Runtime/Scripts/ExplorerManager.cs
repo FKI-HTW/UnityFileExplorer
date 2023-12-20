@@ -9,15 +9,47 @@ namespace CENTIS.UnityFileExplorer
 {
     public class ExplorerManager : MonoBehaviour
     {
-		#region fields
+		#region ui references
 
-		public ExplorerConfiguration ExplorerConfiguration
-		{ 
-			get => _explorerConfiguration; 
-			set => _explorerConfiguration = value; 
-		}
-        [SerializeField] private ExplorerConfiguration _explorerConfiguration;
-		[SerializeField] private GameObject _canvas;
+		public GameObject FileExplorerContainer { get => _fileExplorerContainer; set => _fileExplorerContainer = value; }
+		[SerializeField] private GameObject _fileExplorerContainer;
+
+		public Button ArrowBackButton { get => _arrowBackButton; set => _arrowBackButton = value; }
+		[SerializeField] private Button _arrowBackButton;
+
+		public Button ArrowForwardButton { get => _arrowForwardButton; set => _arrowForwardButton = value; }
+		[SerializeField] private Button _arrowForwardButton;
+
+		public GameObject PathContainer { get => _pathContainer; set => _pathContainer = value; }
+		[SerializeField] private GameObject _pathContainer;
+
+		public UIPathFolder PathFolderPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
+		[SerializeField] private UIPathFolder _folderButtonPrefab;
+
+		public Button ExitButton { get => _exitButton; set => _exitButton = value; }
+		[SerializeField] private Button _exitButton;
+
+		public GameObject NodeContainer { get => _nodeContainer; set => _nodeContainer = value; }
+		[SerializeField] private GameObject _nodeContainer;
+
+		public UINode FolderPrefab { get => _folderPrefab; set => _folderPrefab = value; }
+		[SerializeField] private UINode _folderPrefab;
+
+		public UINode FilePrefab { get => _filePrefab; set => _filePrefab = value; }
+		[SerializeField] private UINode _filePrefab;
+
+		public GameObject EmptyFolderPrefab { get => _emptyFolderPrefab; set => _emptyFolderPrefab = value; }
+		[SerializeField] private GameObject _emptyFolderPrefab;
+
+		public Button CancelButton { get => _cancelButton; set => _cancelButton = value; }
+		[SerializeField] private Button _cancelButton;
+
+		public Button ChooseFileButton { get => _chooseFileButton; set => _chooseFileButton = value; }
+		[SerializeField] private Button _chooseFileButton;
+
+		#endregion
+
+		#region fields
 
 		private VirtualFolderNode	_root; // a virtual folder above the disks
 		private VirtualFolderNode	_currentFolder;
@@ -29,24 +61,11 @@ namespace CENTIS.UnityFileExplorer
 		private readonly HashSet<TreeNode> _hashedNodes = new(); // hashset with all node references for O(1) access
 
 		private readonly List<PathNode> _pathNodes = new();
-		private bool _showPath;
 
 		private Action<string> _fileFoundCallback;
 
 		private string _fileExtension;
 		private bool _certainFilesOnly = false;
-
-		private GameObject _upperUIBar;
-		private GameObject _pathContainerPrefab;
-		public GameObject NodeContainerPrefab => _nodeContainerPrefab;
-		private GameObject _nodeContainerPrefab;
-		private GameObject _bottomUIBar;
-				
-		private Button _exitButton;
-		private Button _backButton;
-		private Button _forwardButton;
-		private Button _cancelButton;
-		private Button _chooseFileButton;
 
 		#endregion
 
@@ -107,42 +126,6 @@ namespace CENTIS.UnityFileExplorer
 			// TODO : close window ?
 		}
 
-		public void GoBack()
-		{
-			if (_lastVisitedNodes.Count == 0) return;
-
-			VirtualFolderNode targetNode = _lastVisitedNodes[^1];
-			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
-			_lastReturnedFromNodes.Add(_currentFolder);
-			
-			_currentFolder.NavigateFrom();
-			_currentFolder = targetNode;
-			_currentFolder.NavigateTo();
-
-			UpdatePath();
-
-			_forwardButton.interactable = true;
-			_backButton.interactable = _lastVisitedNodes.Count != 0;
-		}
-
-		public void GoForward()
-		{
-			if (_lastReturnedFromNodes.Count == 0) return;
-
-			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
-			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
-			_lastVisitedNodes.Add(_currentFolder);
-
-			_currentFolder.NavigateFrom();
-			_currentFolder = targetNode;
-			_currentFolder.NavigateTo();
-
-			UpdatePath();
-
-			_backButton.interactable = true;
-			_forwardButton.interactable = _lastReturnedFromNodes.Count != 0;
-		}
-
 		#endregion
 
 		#region private methods
@@ -186,62 +169,40 @@ namespace CENTIS.UnityFileExplorer
 
 		private void LoadCustomPrefabs()
 		{
-			if (ExplorerConfiguration.TopUIBar == null)
-				throw new NullReferenceException("The Top UI Bar needs to be defined to create the file explorer!");
-			if (ExplorerConfiguration.ExitButtonPrefab == null)
-				throw new NullReferenceException("The Exit Button needs to be defined to create the file explorer!");
-			if (ExplorerConfiguration.NodeContainerPrefab == null)
-				throw new NullReferenceException("The Node Container needs to be defined to create the file explorer!");
-			if (ExplorerConfiguration.BottomUIBar == null)
-				throw new NullReferenceException("The Bottom UI Bar needs to be defined to create the file explorer!");
-			if (ExplorerConfiguration.CancelButtonPrefab == null)
-				throw new NullReferenceException("The Cancel Button needs to be defined to create the file explorer!");
-			if (ExplorerConfiguration.ChooseFileButtonPrefab == null)
-				throw new NullReferenceException("The Choose File Button needs to be defined to create the file explorer!");
-				
-
-			_upperUIBar = Instantiate(ExplorerConfiguration.TopUIBar, _canvas.transform);
-
-			if (ExplorerConfiguration.ArrowBackPrefab != null)
+			if (ArrowBackButton != null)
 			{
-				_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
-				_backButton.onClick.AddListener(GoBack);
-				_backButton.interactable = false;
+				ArrowBackButton.onClick.AddListener(GoBack);
+				ArrowBackButton.interactable = false;
 			}
 
-			if (ExplorerConfiguration.ArrowForwardPrefab != null)
+			if (ArrowForwardButton != null)
 			{
-				_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
-				_forwardButton.onClick.AddListener(GoForward);
-				_forwardButton.interactable = false;
+				ArrowForwardButton.onClick.AddListener(GoForward);
+				ArrowForwardButton.interactable = false;
 			}
 
-			if (ExplorerConfiguration.PathContainerPrefab != null)
+			if (ExitButton != null)
 			{
-				if (ExplorerConfiguration.PathFolderPrefab == null)
-					throw new NullReferenceException("The Path Folder needs to be defined if the folder path is to be shown!");
-				_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
-				_showPath = true;
+				ExitButton.onClick.AddListener(CancelFindFile);
 			}
 
-			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
-			_exitButton.onClick.AddListener(CancelFindFile);
+			if (CancelButton != null)
+			{
+				CancelButton.onClick.AddListener(CancelFindFile);
+			}
 
-			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
-
-			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
-
-			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform);
-			_cancelButton.onClick.AddListener(CancelFindFile);
-
-			_chooseFileButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform);
-			_chooseFileButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+			if (ChooseFileButton != null)
+			{
+				ChooseFileButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+			}
 		}
 
 		// TODO : optimize this
 		private void UpdatePath()
 		{
-			if (!_showPath) return;
+			if (PathContainer == null
+				|| PathFolderPrefab == null) 
+				return;
 
 			foreach (PathNode node in _pathNodes)
 			{
@@ -264,11 +225,51 @@ namespace CENTIS.UnityFileExplorer
 			for (int i = _pathNodes.Count - 1; i >= 0; i--)
 			{
 				PathNode node = _pathNodes[i];
-				UIPathFolder uiInstance = Instantiate(ExplorerConfiguration.PathFolderPrefab, _pathContainerPrefab.transform);
+				UIPathFolder uiInstance = Instantiate(PathFolderPrefab, PathContainer.transform);
 				uiInstance.Initialize(node.Name);
 				uiInstance.OnActivated += () => ActivateNode(node.FolderNode);
 				node.UIInstance = uiInstance;
 			}
+		}
+
+		private void GoBack()
+		{
+			if (_lastVisitedNodes.Count == 0) return;
+
+			VirtualFolderNode targetNode = _lastVisitedNodes[^1];
+			_lastVisitedNodes.RemoveAt(_lastVisitedNodes.Count - 1);
+			_lastReturnedFromNodes.Add(_currentFolder);
+
+			_currentFolder.NavigateFrom();
+			_currentFolder = targetNode;
+			_currentFolder.NavigateTo();
+
+			UpdatePath();
+
+			if (ArrowForwardButton != null)
+				ArrowForwardButton.interactable = true;
+			if (ArrowBackButton != null)
+				ArrowBackButton.interactable = _lastVisitedNodes.Count != 0;
+		}
+
+		private void GoForward()
+		{
+			if (_lastReturnedFromNodes.Count == 0) return;
+
+			VirtualFolderNode targetNode = _lastReturnedFromNodes[^1];
+			_lastReturnedFromNodes.RemoveAt(_lastReturnedFromNodes.Count - 1);
+			_lastVisitedNodes.Add(_currentFolder);
+
+			_currentFolder.NavigateFrom();
+			_currentFolder = targetNode;
+			_currentFolder.NavigateTo();
+
+			UpdatePath();
+
+			if (ArrowBackButton != null)
+				ArrowBackButton.interactable = true;
+			if (ArrowForwardButton != null)
+				ArrowForwardButton.interactable = _lastReturnedFromNodes.Count != 0;
 		}
 
 		private void NavigateToNode(VirtualFolderNode node)
@@ -291,8 +292,10 @@ namespace CENTIS.UnityFileExplorer
 
 			_lastVisitedNodes.Add(_currentFolder);
 			_lastReturnedFromNodes.Clear();
-			_backButton.interactable = true;
-			_forwardButton.interactable = false;
+			if (ArrowBackButton != null)
+				ArrowBackButton.interactable = true;
+			if (ArrowForwardButton != null)
+				ArrowForwardButton.interactable = false;
 
 			_currentFolder.NavigateFrom();
 			_currentFolder = node;
