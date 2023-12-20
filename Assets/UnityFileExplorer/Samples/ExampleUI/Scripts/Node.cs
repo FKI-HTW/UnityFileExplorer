@@ -1,14 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using CENTIS.UnityFileExplorer;
 using TMPro;
 
-public class UIFolder : UINode
+public class Node : UINode
 {
 	[SerializeField] private TMP_Text _name;
 
-	public override void Initiate(NodeInformation info)
+	public override void Initialize(NodeInformation info)
 	{
 		_name.text = info.Name;
 	}

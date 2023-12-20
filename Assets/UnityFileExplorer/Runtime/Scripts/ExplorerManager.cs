@@ -4,8 +4,6 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using TMPro;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -30,6 +28,9 @@ namespace CENTIS.UnityFileExplorer
 
 		private readonly HashSet<TreeNode> _hashedNodes = new(); // hashset with all node references for O(1) access
 
+		private readonly List<PathNode> _pathNodes = new();
+		private bool _showPath;
+
 		private Action<string> _fileFoundCallback;
 
 		private string _fileExtension;
@@ -45,11 +46,7 @@ namespace CENTIS.UnityFileExplorer
 		private Button _backButton;
 		private Button _forwardButton;
 		private Button _cancelButton;
-		private Button _confirmChoiceButton;
-
-		private Button[] _folderButtons;
-		private TextMeshProUGUI[] _folderButtonTexts;
-		private GameObject[] _separators;
+		private Button _chooseFileButton;
 
 		#endregion
 
@@ -72,8 +69,7 @@ namespace CENTIS.UnityFileExplorer
 				_certainFilesOnly = true;
 			}
 			_fileFoundCallback = onFilePathFound;
-			_root = new VirtualFolderNode(this, new() { Name = "This PC/" }, null);
-			InstantiatePathPrefabs(); // TODO : temporary
+			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -88,6 +84,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				_currentFolder = _root;
 				_root.NavigateTo();
+				UpdatePath();
 				return;
 			}
 
@@ -100,6 +97,7 @@ namespace CENTIS.UnityFileExplorer
 			_hashedNodes.Add(startNode);
 			_currentFolder = startNode;			
 			startNode.NavigateTo();
+			UpdatePath();
 		}
 
 		public void CancelFindFile()
@@ -120,7 +118,7 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
 
-			UpdateFolderPath(_currentFolder.ToString());
+			UpdatePath();
 
 			_forwardButton.interactable = true;
 			_backButton.interactable = _lastVisitedNodes.Count != 0;
@@ -138,7 +136,7 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = targetNode;
 			_currentFolder.NavigateTo();
 
-			UpdateFolderPath(_currentFolder.ToString());
+			UpdatePath();
 
 			_backButton.interactable = true;
 			_forwardButton.interactable = _lastReturnedFromNodes.Count != 0;
@@ -152,7 +150,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			if (node == null) return;
 			if (node.Equals(_selectedNode))
-				ActivateNode(node);
+				ActivateNode(_selectedNode);
 			else
 				_selectedNode = node;
 		}
@@ -167,6 +165,7 @@ namespace CENTIS.UnityFileExplorer
 		{
 			if (node == null) return;
 
+			_selectedNode = null;
 			switch (node)
 			{
 				case FolderNode folderNode:
@@ -186,157 +185,88 @@ namespace CENTIS.UnityFileExplorer
 
 		private void LoadCustomPrefabs()
 		{
-			_upperUIBar = Instantiate(ExplorerConfiguration.UpperUIBar, _canvas.transform);
-			_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
-			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
-			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
+			if (ExplorerConfiguration.TopUIBar == null)
+				throw new NullReferenceException("The Top UI Bar needs to be defined to create the file explorer!");
+			if (ExplorerConfiguration.ExitButtonPrefab == null)
+				throw new NullReferenceException("The Exit Button needs to be defined to create the file explorer!");
+			if (ExplorerConfiguration.NodeContainerPrefab == null)
+				throw new NullReferenceException("The Node Container needs to be defined to create the file explorer!");
+			if (ExplorerConfiguration.BottomUIBar == null)
+				throw new NullReferenceException("The Bottom UI Bar needs to be defined to create the file explorer!");
+			if (ExplorerConfiguration.CancelButtonPrefab == null)
+				throw new NullReferenceException("The Cancel Button needs to be defined to create the file explorer!");
+			if (ExplorerConfiguration.ChooseFileButtonPrefab == null)
+				throw new NullReferenceException("The Choose File Button needs to be defined to create the file explorer!");
+				
 
+			_upperUIBar = Instantiate(ExplorerConfiguration.TopUIBar, _canvas.transform);
 
-			_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
-			_backButton.onClick.AddListener(GoBack);
-			_backButton.interactable = false;
+			if (ExplorerConfiguration.ArrowBackPrefab != null)
+			{
+				_backButton = Instantiate(ExplorerConfiguration.ArrowBackPrefab, _upperUIBar.transform);
+				_backButton.onClick.AddListener(GoBack);
+				_backButton.interactable = false;
+			}
 
-			_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
-			_forwardButton.onClick.AddListener(GoForward);
-			_forwardButton.interactable = false;
+			if (ExplorerConfiguration.ArrowForwardPrefab != null)
+			{
+				_forwardButton = Instantiate(ExplorerConfiguration.ArrowForwardPrefab, _upperUIBar.transform);
+				_forwardButton.onClick.AddListener(GoForward);
+				_forwardButton.interactable = false;
+			}
+
+			if (ExplorerConfiguration.PathContainerPrefab != null)
+			{
+				if (ExplorerConfiguration.PathFolderPrefab == null)
+					throw new NullReferenceException("The Path Folder needs to be defined if the folder path is to be defined!");
+				_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
+				_showPath = true;
+			}
 
 			_exitButton = Instantiate(ExplorerConfiguration.ExitButtonPrefab, _upperUIBar.transform);
 			_exitButton.onClick.AddListener(CancelFindFile);
 
+			_nodeContainerPrefab = Instantiate(ExplorerConfiguration.NodeContainerPrefab, _canvas.transform);
+
+			_bottomUIBar = Instantiate(ExplorerConfiguration.BottomUIBar, _canvas.transform);
+
 			_cancelButton = Instantiate(ExplorerConfiguration.CancelButtonPrefab, _bottomUIBar.transform);
 			_cancelButton.onClick.AddListener(CancelFindFile);
 
-			_confirmChoiceButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform);
-			_confirmChoiceButton.onClick.AddListener(() => ActivateNode(_selectedNode));
+			_chooseFileButton = Instantiate(ExplorerConfiguration.ChooseFileButtonPrefab, _bottomUIBar.transform);
+			_chooseFileButton.onClick.AddListener(() => ActivateNode(_selectedNode));
 		}
 
-		private void InstantiatePathPrefabs()
-        {
-			_separators = new GameObject[6];
-			_folderButtons = new Button[5];
-			_folderButtonTexts = new TextMeshProUGUI[5];
-
-			_separators[0] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-			// 1 ***
-			_folderButtons[0] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
-			_folderButtonTexts[0] = _folderButtons[0].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtonTexts[0].SetText(_root.ToString());
-			_folderButtons[0].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[0].text)); // check if this works
-
-			_separators[1] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-			// 2 ***
-			_folderButtons[1] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
-			_folderButtonTexts[1] = _folderButtons[1].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtons[1].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[1].text));
-
-			_separators[2] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-			// 3 ***
-			_folderButtons[2] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
-			_folderButtonTexts[2] = _folderButtons[2].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtons[2].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[2].text));
-
-			_separators[3] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-			// 4 ***
-			_folderButtons[3] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
-			_folderButtonTexts[3] = _folderButtons[3].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtons[3].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[3].text));
-
-			_separators[4] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-			// 5 ***
-			_folderButtons[4] = Instantiate(ExplorerConfiguration.FolderButtonPrefab, _pathContainerPrefab.transform);
-			_folderButtonTexts[4] = _folderButtons[4].GetComponentInChildren<TextMeshProUGUI>();
-			_folderButtons[4].onClick.AddListener(() => OnFolderButtonClick(_folderButtonTexts[4].text)); 
-
-			_separators[5] = Instantiate(ExplorerConfiguration.SeperatorPrefab, _pathContainerPrefab.transform);
-
-			for (int i = 1; i < _folderButtons.Length; i++)
-			{
-				_folderButtons[i].gameObject.SetActive(false);
-				_separators[i + 1].SetActive(false);
-			}
-		}
-
-		private void UpdateFolderPath(string currentFolderPath)
+		// TODO : optimize this
+		private void UpdatePath()
 		{
-			foreach (TextMeshProUGUI texxt in _folderButtonTexts) { texxt.text = ""; } //clear button texts
+			if (!_showPath) return;
 
-			currentFolderPath = _root + currentFolderPath;
-			Debug.Log(currentFolderPath); //todo remove when all works properly
-			string[] folders = currentFolderPath.Split(new[] { Path.DirectorySeparatorChar, '/' }, StringSplitOptions.RemoveEmptyEntries);
-			if (folders.Length <= _folderButtons.Length)
+			foreach (PathNode node in _pathNodes)
 			{
-				for (int i = 0; i < folders.Length; i++)
+				GameObject.Destroy(node.UIInstance.gameObject);
+			}
+			_pathNodes.Clear();
+
+			VirtualFolderNode folderNode = _currentFolder;
+			while (folderNode != null)
+			{
+				string name = folderNode.Info.Name.Replace("\\", "").Replace("/", "");
+				_pathNodes.Add(new()
 				{
-					_folderButtonTexts[i].SetText(ShortenFilenames(folders[i]));
-					_folderButtons[i].gameObject.SetActive(true);
-					_separators[i + 1].SetActive(true);
-				}
-
-				//dont show buttons with bigger index than folders.length
-				for (int i = folders.Length; i < _folderButtons.Length; i++)
-				{
-					_folderButtons[i].gameObject.SetActive(false);
-					_separators[i + 1].SetActive(false);
-				}
-				return;
+					FolderNode = folderNode,
+					Name = name,
+				});
+				folderNode = folderNode.Parent;
 			}
 
-			//case path has more folderNames than folder buttons -> just name buttons backwards with folder names 'deepest' in file structure
-			int j = 1;
-			for (int i = 4; i >= 0; i--)
+			for (int i = _pathNodes.Count - 1; i >= 0; i--)
 			{
-				_folderButtonTexts[i].SetText(ShortenFilenames(folders[^j]));
-				_folderButtons[i].gameObject.SetActive(true);
-				_separators[i + 1].SetActive(true);
-				j++;
+				PathNode node = _pathNodes[i];
+				UIPathFolder uiInstance = Instantiate(ExplorerConfiguration.PathFolderPrefab, _pathContainerPrefab.transform);
+				uiInstance.Initialize(node.Name);
+				node.UIInstance = uiInstance;
 			}
-		}
-
-		private string ShortenFilenames(string inputFolderName)
-        {
-			int maxLength = 14;
-			return inputFolderName.Length > maxLength
-					? $"{inputFolderName[..(maxLength - 3)]}..."
-					: inputFolderName;
-		}
-
-		private void OnFolderButtonClick(string folderName) //TODO
-		{
-			Debug.Log($"Navigate to: {folderName}");
-
-			//Frage ist, wie definieren wir den "Sprung" zu einem Ordner ? als select und zu ordner springen, also als gesprungenes forward quasi? 
-			// oder als back in den unter back gespeicherten ordnern im verlauf gehen? (der user kann im verlauf ja aber 3 mal an dem ordner angekommen sein,
-			//	der nun direkt angeklickt wurde, welchen nimmt man dann? 
-			// -> conclusion: jump zum ordner:
-
-			FolderNode destinationNode = null;
-			//VirtualFolderNode foundNode = null; **ohne linq
-			VirtualFolderNode foundNode = _lastVisitedNodes.FirstOrDefault(node => node.Info.Name.Equals(folderName)); //NullPointer - not set to an instance of an obeject
-
-			/*ohne linq:
-			 * 
-			 * 
-			
-			foreach (VirtualFolderNode node in _lastVisitedNodes)
-			{
-				if (node.Info.Name == folderName)
-				{
-					foundNode = node;
-					break;
-				}
-			}*/
-
-			if (foundNode != null)
-			{
-				destinationNode = FindParentRecursive(new DirectoryInfo(foundNode.ToString()));
-			}
-			if (destinationNode != null)
-            {
-				NavigateToNode(destinationNode);
-				UpdateFolderPath(destinationNode.ToString());
-				return;
-			}
-			Debug.Log("Did not find clicked Node.");
 		}
 
 		private void NavigateToNode(VirtualFolderNode node)
@@ -366,7 +296,7 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder = node;
 			_currentFolder.NavigateTo();
 
-			UpdateFolderPath(node.ToString());
+			UpdatePath();
 		}
 
 		private void ChooseFile(FileNode node)

@@ -6,9 +6,9 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 	{
 		public ExplorerManager Manager { get; }
 		public NodeInformation Info { get; }
-        public TreeNode Parent { get; }
+        public VirtualFolderNode Parent { get; }
 
-		public TreeNode(ExplorerManager manager, NodeInformation info, TreeNode parent)
+		public TreeNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
 		{
 			Manager = manager;
 			Info = info;

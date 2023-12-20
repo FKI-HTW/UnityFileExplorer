@@ -18,7 +18,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance.OnSelected += () => manager.SelectNode(this);
 			UIInstance.OnDeselected += () => manager.DeselectNode(this);
 			UIInstance.OnActivated += () => manager.ActivateNode(this);
-			UIInstance.Initiate(info);
+			UIInstance.Initialize(info);
 		}
 
 		public bool Equals(FileNode other)
