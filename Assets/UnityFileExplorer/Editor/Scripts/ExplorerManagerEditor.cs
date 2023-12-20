@@ -18,27 +18,26 @@ namespace CENTIS.UnityFileExplorer
 		}
 
 		private SerializedProperty _explorerConfig;
-		private SerializedProperty _fileContainer;
+		private SerializedProperty _canvas;
 
 		public void OnEnable()
 		{
-			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration"); ;
-			_fileContainer = serializedObject.FindProperty("_fileContainer"); ;
+			_explorerConfig = serializedObject.FindProperty("_explorerConfiguration");
+			_canvas = serializedObject.FindProperty("_canvas");
 		}
 
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
 
+			EditorGUILayout.PropertyField(_canvas, new GUIContent("File Explorer Canvas"));
+
 			EditorGUILayout.PropertyField(_explorerConfig, new GUIContent("Explorer Configuration"));
 			if (_explorerConfig.objectReferenceValue != null)
 			{
-				EditorGUI.indentLevel++;
 				SettingsEditor.OnInspectorGUI();
-				EditorGUI.indentLevel--;
 			}
 
-			EditorGUILayout.PropertyField(_fileContainer);
 
 			serializedObject.ApplyModifiedProperties();
 		}

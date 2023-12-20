@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public class FileNode : TreeNode, IEquatable<FileNode>
+	internal class FileNode : TreeNode, IEquatable<FileNode>
 	{
 		public UINode UIInstance { get; private set; }
 
@@ -12,13 +12,12 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		{
 			UIInstance = GameObject.Instantiate(
 				manager.ExplorerConfiguration.FilePrefab, 
-				manager.FileContainer.transform);
-			UIInstance.gameObject.name = ToString();
+				manager.NodeContainerPrefab.transform);
+			UIInstance.Initialize(info);
 			UIInstance.gameObject.SetActive(false);
 			UIInstance.OnSelected += () => manager.SelectNode(this);
 			UIInstance.OnDeselected += () => manager.DeselectNode(this);
 			UIInstance.OnActivated += () => manager.ActivateNode(this);
-			UIInstance.Initiate(info);
 		}
 
 		public bool Equals(FileNode other)
@@ -47,6 +46,11 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance.OnDeselected -= () => Manager.DeselectNode(this);
 			UIInstance.OnActivated -= () => Manager.ActivateNode(this);
 			GameObject.Destroy(UIInstance);
+		}
+
+		public override void MissingPermissions()
+		{
+			UIInstance.MissingPermissions();
 		}
 	}
 }

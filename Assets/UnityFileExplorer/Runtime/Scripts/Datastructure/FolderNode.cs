@@ -4,26 +4,22 @@ using UnityEngine;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public class FolderNode : VirtualFolderNode, IEquatable<FolderNode>
+	internal class FolderNode : VirtualFolderNode, IEquatable<FolderNode>
 	{
 		public UINode UIInstance { get; private set; }
 
-		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children)
+		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
 			: base(manager, info, parent, children)
 		{
 			UIInstance = GameObject.Instantiate(
 				manager.ExplorerConfiguration.FolderPrefab, 
-				manager.FileContainer.transform);
-			UIInstance.gameObject.name = ToString();
+				manager.NodeContainerPrefab.transform);
+			UIInstance.Initialize(info);
 			UIInstance.gameObject.SetActive(false);
 			UIInstance.OnSelected += () => manager.SelectNode(this);
 			UIInstance.OnDeselected += () => manager.DeselectNode(this);
 			UIInstance.OnActivated += () => manager.ActivateNode(this);
-			UIInstance.Initiate(info);
 		}
-
-		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
-			: this(manager, info, parent, new()) { }
 
 		public bool Equals(FolderNode other)
 		{
@@ -54,6 +50,11 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 				UIInstance.OnActivated -= () => Manager.ActivateNode(this);
 				GameObject.Destroy(UIInstance);
 			}
+		}
+
+		public override void MissingPermissions()
+		{
+			UIInstance.MissingPermissions();
 		}
 	}
 }

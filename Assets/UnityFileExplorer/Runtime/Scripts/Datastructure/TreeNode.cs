@@ -2,13 +2,13 @@ using System;
 
 namespace CENTIS.UnityFileExplorer.Datastructure
 {
-	public abstract class TreeNode : IEquatable<TreeNode>
+	internal abstract class TreeNode : IEquatable<TreeNode>
 	{
 		public ExplorerManager Manager { get; }
 		public NodeInformation Info { get; }
-        public TreeNode Parent { get; }
+        public VirtualFolderNode Parent { get; }
 
-		public TreeNode(ExplorerManager manager, NodeInformation info, TreeNode parent)
+		public TreeNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
 		{
 			Manager = manager;
 			Info = info;
@@ -17,7 +17,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 
 		public override string ToString()
 		{
-			if (string.IsNullOrEmpty(Info.Path))
+			if (string.IsNullOrEmpty(Info?.Path)) 
 				return Info.Name;
 			return $"{Info.Path}/{Info.Name}";
 		}
@@ -38,5 +38,6 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public abstract void Show();
 		public abstract void Hide();
 		public abstract void Unload();
+		public abstract void MissingPermissions();
 	}
 }
