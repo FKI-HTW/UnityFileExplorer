@@ -70,6 +70,7 @@ namespace CENTIS.UnityFileExplorer
 			}
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
+			_hashedNodes.Add(_root);
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -218,7 +219,7 @@ namespace CENTIS.UnityFileExplorer
 			if (ExplorerConfiguration.PathContainerPrefab != null)
 			{
 				if (ExplorerConfiguration.PathFolderPrefab == null)
-					throw new NullReferenceException("The Path Folder needs to be defined if the folder path is to be defined!");
+					throw new NullReferenceException("The Path Folder needs to be defined if the folder path is to be shown!");
 				_pathContainerPrefab = Instantiate(ExplorerConfiguration.PathContainerPrefab, _canvas.transform);
 				_showPath = true;
 			}
@@ -277,7 +278,7 @@ namespace CENTIS.UnityFileExplorer
 				{
 					AddDirectories(node);
 					AddFiles(node);
-					if (node.Children == null || node.Children.Count == 0)
+					if (!node.IsFolderLoaded || node.Children.Count == 0)
 					{
 						EmptyNode emptyNode = new(this, node);
 						node.AddChild(emptyNode);

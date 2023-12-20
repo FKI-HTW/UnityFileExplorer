@@ -53,7 +53,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public void NavigateTo()
 		{
 			if (Children == null)
-				throw new NullReferenceException("Folder with unloaded children was opened.");
+				throw new NullReferenceException("Folder with unloaded children was opened!");
 
 			foreach (TreeNode child in Children)
 				child.Show();
@@ -62,7 +62,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public void NavigateFrom()
 		{
 			if (Children == null)
-				throw new NullReferenceException("Folder with unloaded children was opened.!");
+				throw new NullReferenceException("Folder with unloaded children was opened!");
 
 			foreach (TreeNode child in Children)
 				child.Hide();
