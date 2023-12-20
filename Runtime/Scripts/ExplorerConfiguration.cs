@@ -9,8 +9,8 @@ namespace CENTIS.UnityFileExplorer
     public class ExplorerConfiguration : ScriptableObject
     {
         //"Container Prefabs"
-        public GameObject UpperUIBar { get => _upperUIBar; set => _upperUIBar = value; }
-        [SerializeField] private GameObject _upperUIBar;
+        public GameObject TopUIBar { get => _topUIBar; set => _topUIBar = value; }
+        [SerializeField] private GameObject _topUIBar;
 
         public GameObject PathContainerPrefab { get => _pathContainerPrefab; set => _pathContainerPrefab = value; }
         [SerializeField] private GameObject _pathContainerPrefab;
@@ -38,11 +38,8 @@ namespace CENTIS.UnityFileExplorer
         [SerializeField] private Button _chooseFileButtonPrefab;
 
         //Folder Path
-        public Button FolderButtonPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
-        [SerializeField] private Button _folderButtonPrefab;
-
-        public GameObject SeperatorPrefab { get => _separatorPrefab; set => _separatorPrefab = value; }
-        [SerializeField] private GameObject _separatorPrefab;
+        public UIPathFolder PathFolderPrefab { get => _folderButtonPrefab; set => _folderButtonPrefab = value; }
+        [SerializeField] private UIPathFolder _folderButtonPrefab;
 
         //Data Structure
         public UINode FolderPrefab { get => _folderPrefab; set => _folderPrefab = value; }

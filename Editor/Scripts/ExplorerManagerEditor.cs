@@ -30,15 +30,14 @@ namespace CENTIS.UnityFileExplorer
 		{
 			serializedObject.Update();
 
+			EditorGUILayout.PropertyField(_canvas, new GUIContent("File Explorer Canvas"));
+
 			EditorGUILayout.PropertyField(_explorerConfig, new GUIContent("Explorer Configuration"));
 			if (_explorerConfig.objectReferenceValue != null)
 			{
-				EditorGUI.indentLevel++;
 				SettingsEditor.OnInspectorGUI();
-				EditorGUI.indentLevel--;
 			}
 
-			EditorGUILayout.PropertyField(_canvas);
 
 			serializedObject.ApplyModifiedProperties();
 		}
