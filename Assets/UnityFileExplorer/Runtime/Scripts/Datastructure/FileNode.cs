@@ -11,8 +11,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			: base(manager, info, parent)
 		{
 			UIInstance = GameObject.Instantiate(
-				manager.ExplorerConfiguration.FilePrefab, 
-				manager.NodeContainerPrefab.transform);
+				manager.FilePrefab, 
+				manager.NodeContainer.transform);
 			UIInstance.Initialize(info);
 			UIInstance.gameObject.SetActive(false);
 			UIInstance.OnSelected += () => manager.SelectNode(this);
