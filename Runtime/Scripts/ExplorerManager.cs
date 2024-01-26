@@ -77,7 +77,7 @@ namespace CENTIS.UnityFileExplorer
 
 		#region public methods
 
-		public void FindFile(
+		public virtual void FindFile(
 			Action<string> onFilePathFound = null,
 			Environment.SpecialFolder? startFolder = null,
 			string fileExtension = null
@@ -121,7 +121,7 @@ namespace CENTIS.UnityFileExplorer
 			UpdatePath();
 		}
 
-		public void CancelFindFile()
+		public virtual void CancelFindFile()
 		{
 			_fileFoundCallback = null;
 			// TODO : close window ?
