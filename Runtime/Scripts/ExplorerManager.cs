@@ -91,6 +91,7 @@ namespace CENTIS.UnityFileExplorer
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
 			_hashedNodes.Add(_root.ToString(), _root);
+			InitFileExplorer();
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -131,6 +132,41 @@ namespace CENTIS.UnityFileExplorer
 
 		#region private methods
 
+		private void InitFileExplorer()
+		{
+			if (ArrowBackButton != null)
+			{
+				ArrowBackButton.onClick.RemoveListener(GoBack);
+				ArrowBackButton.onClick.AddListener(GoBack);
+				ArrowBackButton.interactable = false;
+			}
+
+			if (ArrowForwardButton != null)
+			{
+				ArrowForwardButton.onClick.RemoveListener(GoForward);
+				ArrowForwardButton.onClick.AddListener(GoForward);
+				ArrowForwardButton.interactable = false;
+			}
+
+			if (ExitButton != null)
+			{
+				ExitButton.onClick.RemoveListener(CancelFindFile);
+				ExitButton.onClick.AddListener(CancelFindFile);
+			}
+
+			if (CancelButton != null)
+			{
+				CancelButton.onClick.RemoveListener(CancelFindFile);
+				CancelButton.onClick.AddListener(CancelFindFile);
+			}
+
+			if (ChooseFileButton != null)
+			{
+				ChooseFileButton.onClick.RemoveListener(ChooseSelectedNode);
+				ChooseFileButton.onClick.AddListener(ChooseSelectedNode);
+			}
+		}
+
 		internal void SelectNode(TreeNode node)
 		{
 			if (node == null) return;
@@ -168,34 +204,9 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
-		private void LoadCustomPrefabs()
+		private void ChooseSelectedNode()
 		{
-			if (ArrowBackButton != null)
-			{
-				ArrowBackButton.onClick.AddListener(GoBack);
-				ArrowBackButton.interactable = false;
-			}
-
-			if (ArrowForwardButton != null)
-			{
-				ArrowForwardButton.onClick.AddListener(GoForward);
-				ArrowForwardButton.interactable = false;
-			}
-
-			if (ExitButton != null)
-			{
-				ExitButton.onClick.AddListener(CancelFindFile);
-			}
-
-			if (CancelButton != null)
-			{
-				CancelButton.onClick.AddListener(CancelFindFile);
-			}
-
-			if (ChooseFileButton != null)
-			{
-				ChooseFileButton.onClick.AddListener(() => ActivateNode(_selectedNode));
-			}
+			ActivateNode(_selectedNode);
 		}
 
 		// TODO : optimize this
@@ -300,7 +311,7 @@ namespace CENTIS.UnityFileExplorer
 		private void ChooseFile(FileNode node)
 		{
 			_fileFoundCallback?.Invoke(node.ToString());
-			// TODO : close explorer ?
+			CancelFindFile();
 		}
 
 		private void AddDirectories(VirtualFolderNode folder)
