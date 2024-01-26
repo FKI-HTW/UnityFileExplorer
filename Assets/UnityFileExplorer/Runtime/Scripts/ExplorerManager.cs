@@ -69,12 +69,6 @@ namespace CENTIS.UnityFileExplorer
 
 		#endregion
 
-		private void Start()
-		{
-			LoadCustomPrefabs();
-			FindFile(onFilePathFound: Debug.Log, null, ".dll"); // for testing - only showing .dll files at the moment
-		}
-
 		#region public methods
 
 		public virtual void FindFile(
