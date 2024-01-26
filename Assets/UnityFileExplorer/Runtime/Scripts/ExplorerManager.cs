@@ -58,7 +58,7 @@ namespace CENTIS.UnityFileExplorer
 		private readonly List<VirtualFolderNode> _lastVisitedNodes = new(); // for back arrow
 		private readonly List<VirtualFolderNode> _lastReturnedFromNodes = new(); // for forward arrow
 
-		private readonly HashSet<TreeNode> _hashedNodes = new(); // hashset with all node references for O(1) access
+		private readonly Dictionary<string, TreeNode> _hashedNodes = new();
 
 		private readonly List<PathNode> _pathNodes = new();
 
@@ -90,7 +90,7 @@ namespace CENTIS.UnityFileExplorer
 
 			_fileFoundCallback = onFilePathFound;
 			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
-			_hashedNodes.Add(_root);
+			_hashedNodes.Add(_root.ToString(), _root);
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
@@ -98,7 +98,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				FolderNode diskNode = new(this, drive.GetNodeInformation(), _root);
 				_root.AddChild(diskNode);
-				_hashedNodes.Add(diskNode);
+				_hashedNodes.Add(diskNode.ToString(), diskNode);
 			}
 
 			if (startFolder == null)
@@ -115,8 +115,8 @@ namespace CENTIS.UnityFileExplorer
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
 			startParent.AddChild(startNode);
-			_hashedNodes.Add(startNode);
-			_currentFolder = startNode;			
+			_hashedNodes.Add(startNode.ToString(), startNode);
+			_currentFolder = startNode;
 			startNode.NavigateTo();
 			UpdatePath();
 		}
@@ -201,7 +201,7 @@ namespace CENTIS.UnityFileExplorer
 		// TODO : optimize this
 		private void UpdatePath()
 		{
-			if (PathContainer == null || PathFolderPrefab == null) return;
+			if (PathContainer == null) return;
 
 			foreach (PathNode node in _pathNodes)
 				GameObject.Destroy(node.UIInstance.gameObject);
@@ -311,7 +311,7 @@ namespace CENTIS.UnityFileExplorer
 			{
 				FolderNode folderNode = new(this, dir.GetNodeInformation(), folder);
 				folder.AddChild(folderNode);
-				_hashedNodes.Add(folderNode);
+				_hashedNodes.Add(folderNode.ToString(), folderNode);
 			}
 		}
 
@@ -325,24 +325,19 @@ namespace CENTIS.UnityFileExplorer
 
 				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
 				folder.AddChild(fileNode);
-				_hashedNodes.Add(fileNode);
+				_hashedNodes.Add(fileNode.ToString(), fileNode);
 			}
-		}
-
-		private bool TryFindNode(DirectoryInfo userDir, out TreeNode node)
-		{
-			return _hashedNodes.TryGetValue(new VirtualFolderNode(this, userDir.GetNodeInformation(), null), out node);
 		}
 
 		private FolderNode FindParentRecursive(DirectoryInfo userDir)
 		{
-			if (TryFindNode(userDir.Parent, out TreeNode parent))
+			if (_hashedNodes.TryGetValue(userDir.Parent.ToString(), out TreeNode parent))
 				return (FolderNode)parent;
 
 			FolderNode nextParent = FindParentRecursive(userDir.Parent);
 			FolderNode newNode = new(this, userDir.Parent.GetNodeInformation(), nextParent);
 			nextParent.AddChild(newNode);
-			_hashedNodes.Add(newNode);
+			_hashedNodes.Add(newNode.ToString(), newNode);
 			return newNode;
 		}
 
