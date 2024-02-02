@@ -4,7 +4,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 {
 	internal abstract class TreeNode : IEquatable<TreeNode>
 	{
-		public ExplorerManager Manager { get; }
+		public ExplorerConfiguration Config { get; }
 		public NodeInformation Info { get; }
         public VirtualFolderNode Parent { get; }
 
@@ -12,9 +12,9 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public event Action<TreeNode> OnDeselected;
 		public event Action<TreeNode> OnActivated;
 
-		public TreeNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent)
+		public TreeNode(ExplorerConfiguration config, NodeInformation info, VirtualFolderNode parent)
 		{
-			Manager = manager;
+			Config = config;
 			Info = info;
 			Parent = parent;
 		}

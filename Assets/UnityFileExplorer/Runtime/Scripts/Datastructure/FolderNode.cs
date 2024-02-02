@@ -8,12 +8,12 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 	{
 		public UINode UIInstance { get; private set; }
 
-		public FolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
-			: base(manager, info, parent, children)
+		public FolderNode(ExplorerConfiguration config, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
+			: base(config, info, parent, children)
 		{
 			UIInstance = GameObject.Instantiate(
-				manager.FolderPrefab, 
-				manager.NodeContainer.transform);
+				config.FolderPrefab,
+				config.NodeContainer.transform);
 			UIInstance.Initialize(info);
 			UIInstance.gameObject.SetActive(false);
 			UIInstance.OnSelected += () => Select(this);
