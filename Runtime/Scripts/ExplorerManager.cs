@@ -76,6 +76,7 @@ namespace CENTIS.UnityFileExplorer
 			Environment.SpecialFolder? startFolder = null,
 			string fileExtension = null
         ){
+			InitFileExplorer();
 			if (!string.IsNullOrEmpty(fileExtension))
 			{
 				_fileExtension = fileExtension;
@@ -85,13 +86,15 @@ namespace CENTIS.UnityFileExplorer
 			_fileFoundCallback = onFilePathFound;
 			_currentFolder = _root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
 			_hashedNodes.Add(_root.ToString(), _root);
-			InitFileExplorer();
 
 			// create drive folders beneath virtual root
 			DriveInfo[] drives = DriveInfo.GetDrives();
 			foreach (DriveInfo drive in drives)
 			{
 				FolderNode diskNode = new(this, drive.GetNodeInformation(), _root);
+				diskNode.OnSelected += SelectNode;
+				diskNode.OnDeselected += DeselectNode;
+				diskNode.OnActivated += ActivateNode;
 				_root.AddChild(diskNode);
 				_hashedNodes.Add(diskNode.ToString(), diskNode);
 			}
@@ -108,6 +111,9 @@ namespace CENTIS.UnityFileExplorer
 			DirectoryInfo startDir = new(startFolderPath);
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
+			startNode.OnSelected += SelectNode;
+			startNode.OnDeselected += DeselectNode;
+			startNode.OnActivated += ActivateNode;
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode.ToString(), startNode);
 			NavigateToNode(startNode);
@@ -168,7 +174,7 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
-		internal void SelectNode(TreeNode node)
+		private void SelectNode(TreeNode node)
 		{
 			if (node == null) return;
 			if (node.Equals(_selectedNode))
@@ -177,13 +183,13 @@ namespace CENTIS.UnityFileExplorer
 				_selectedNode = node;
 		}
 
-		internal void DeselectNode(TreeNode node)
+		private void DeselectNode(TreeNode node)
 		{
 			if (_selectedNode == node)
 				_selectedNode = null;
 		}
 
-		internal void ActivateNode(TreeNode node)
+		private void ActivateNode(TreeNode node)
 		{
 			if (node == null) return;
 
@@ -203,6 +209,12 @@ namespace CENTIS.UnityFileExplorer
 				default:
 					throw new Exception("How did this happen?");
 			}
+		}
+
+		private void ChooseFile(FileNode node)
+		{
+			_fileFoundCallback?.Invoke(node.ToString());
+			CancelFindFile();
 		}
 
 		private void ChooseSelectedNode()
@@ -309,12 +321,6 @@ namespace CENTIS.UnityFileExplorer
 			UpdatePath();
 		}
 
-		private void ChooseFile(FileNode node)
-		{
-			_fileFoundCallback?.Invoke(node.ToString());
-			CancelFindFile();
-		}
-
 		private void AddDirectories(VirtualFolderNode folder)
 		{
 			string folderPath = folder.ToString();
@@ -322,6 +328,9 @@ namespace CENTIS.UnityFileExplorer
 			foreach (DirectoryInfo dir in containedDir)
 			{
 				FolderNode folderNode = new(this, dir.GetNodeInformation(), folder);
+				folderNode.OnSelected += SelectNode;
+				folderNode.OnDeselected += DeselectNode;
+				folderNode.OnActivated += ActivateNode;
 				folder.AddChild(folderNode);
 				_hashedNodes.Add(folderNode.ToString(), folderNode);
 			}
@@ -336,6 +345,9 @@ namespace CENTIS.UnityFileExplorer
 				if (_certainFilesOnly && !file.Name.EndsWith(_fileExtension)) continue;
 
 				FileNode fileNode = new(this, file.GetNodeInformation(), folder);
+				fileNode.OnSelected += SelectNode;
+				fileNode.OnDeselected += DeselectNode;
+				fileNode.OnActivated += ActivateNode;
 				folder.AddChild(fileNode);
 				_hashedNodes.Add(fileNode.ToString(), fileNode);
 			}
@@ -348,6 +360,9 @@ namespace CENTIS.UnityFileExplorer
 
 			FolderNode nextParent = FindParentRecursive(userDir.Parent);
 			FolderNode newNode = new(this, userDir.Parent.GetNodeInformation(), nextParent);
+			newNode.OnSelected += SelectNode;
+			newNode.OnDeselected += DeselectNode;
+			newNode.OnActivated += ActivateNode;
 			nextParent.AddChild(newNode);
 			_hashedNodes.Add(newNode.ToString(), newNode);
 			return newNode;
