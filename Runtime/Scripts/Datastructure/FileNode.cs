@@ -45,7 +45,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			UIInstance.OnSelected -= () => Manager.SelectNode(this);
 			UIInstance.OnDeselected -= () => Manager.DeselectNode(this);
 			UIInstance.OnActivated -= () => Manager.ActivateNode(this);
-			GameObject.Destroy(UIInstance);
+			GameObject.Destroy(UIInstance.gameObject);
 		}
 
 		public override void MissingPermissions()

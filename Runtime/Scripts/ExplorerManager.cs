@@ -119,7 +119,16 @@ namespace CENTIS.UnityFileExplorer
 		public virtual void CancelFindFile()
 		{
 			_fileFoundCallback = null;
-			// TODO : close window ?
+			_root.Unload();
+			_selectedNode = _currentFolder = _root = null;
+			_hashedNodes.Clear();
+			_lastVisitedNodes.Clear();
+			_lastReturnedFromNodes.Clear();
+			foreach (PathNode node in _pathNodes)
+				GameObject.Destroy(node.UIInstance.gameObject);
+			_pathNodes.Clear();
+			_fileExtension = string.Empty;
+			_certainFilesOnly = false;
 		}
 
 		#endregion
