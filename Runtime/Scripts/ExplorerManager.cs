@@ -83,7 +83,7 @@ namespace CENTIS.UnityFileExplorer
 			}
 
 			_fileFoundCallback = onFilePathFound;
-			_root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
+			_currentFolder = _root = new VirtualFolderNode(this, new() { Name = "This PC" }, null);
 			_hashedNodes.Add(_root.ToString(), _root);
 			InitFileExplorer();
 
@@ -98,7 +98,6 @@ namespace CENTIS.UnityFileExplorer
 
 			if (startFolder == null)
 			{
-				_currentFolder = _root;
 				_root.NavigateTo();
 				UpdatePath();
 				return;
@@ -111,8 +110,7 @@ namespace CENTIS.UnityFileExplorer
 			FolderNode startNode = new(this, startDir.GetNodeInformation(), startParent);
 			startParent.AddChild(startNode);
 			_hashedNodes.Add(startNode.ToString(), startNode);
-			_currentFolder = startNode;
-			startNode.NavigateTo();
+			NavigateToNode(startNode);
 			UpdatePath();
 		}
 
