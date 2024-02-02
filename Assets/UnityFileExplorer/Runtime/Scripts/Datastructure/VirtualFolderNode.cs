@@ -8,8 +8,8 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public List<TreeNode> Children { get; private set; }
 		public bool IsFolderLoaded => Children != null;
 
-		public VirtualFolderNode(ExplorerManager manager, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
-			: base(manager, info, parent)
+		public VirtualFolderNode(ExplorerConfiguration config, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
+			: base(config, info, parent)
 		{
 			Children = children;
 		}

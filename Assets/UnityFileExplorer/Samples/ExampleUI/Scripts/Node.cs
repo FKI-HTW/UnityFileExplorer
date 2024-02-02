@@ -13,7 +13,6 @@ public class Node : UINode
 
 	public override void MissingPermissions()
 	{
-		//Todo - check if unauthorized text has been added already before adding it again
-		_name.text += " --- Unauthorized Access!";
+		Debug.LogError("Unauthorized Access!");
 	}
 }
