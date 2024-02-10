@@ -8,6 +8,7 @@ namespace CENTIS.UnityFileExplorer
         {
             return new()
             {
+                Type = ENodeType.Drive,
                 Name = driveInfo.Name
 			};
         }
@@ -16,6 +17,7 @@ namespace CENTIS.UnityFileExplorer
         {
             return new()
             {
+                Type = ENodeType.Folder,
                 Name = directoryInfo.Name,
                 Path = directoryInfo.Parent?.FullName,
                 CreatedAt = directoryInfo.CreationTime,
@@ -27,6 +29,7 @@ namespace CENTIS.UnityFileExplorer
         {
 			return new()
 			{
+                Type = ENodeType.File,
 				Name = fileInfo.Name,
 				Path = fileInfo.DirectoryName,
 				CreatedAt = fileInfo.CreationTime,
