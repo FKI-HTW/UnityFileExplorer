@@ -2,7 +2,7 @@
     "name": "CENTIS.UnityFileExplorer.Editor",
     "rootNamespace": "CENTIS.UnityFileExplorer",
     "references": [
-        "GUID:d2c195ebd1878eb469630f91eebf2707"
+        "GUID:1d1a575250af42d0b1311e79313c10ef"
     ],
     "includePlatforms": [
         "Editor"
