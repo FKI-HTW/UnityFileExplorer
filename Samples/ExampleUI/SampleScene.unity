@@ -600,16 +600,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1488531848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b08e51bc10e6b64b82e570fea5d40e3, type: 3}
+  m_Script: {fileID: 11500000, guid: 67e8b2f1ead44bd0b54963ee06c8a752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _config:
     _nodeContainer: {fileID: 6619407280462070432}
-    _folderPrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
-    _filePrefab: {fileID: 3905607546762081316, guid: 0e8fe24bd27ac61468c808405b02f9d1, type: 3}
-    _emptyFolderPrefab: {fileID: 4921745232775827764, guid: fca2149f8bf745d4fbc0e76f53849d6f, type: 3}
+    _folderPrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}
+    _filePrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}
+    _emptyFolderPrefab: {fileID: 4921745232775827764, guid: f6503fff278444d0856c6225615d72e3, type: 3}
     _pathContainer: {fileID: 6619407280820904100}
-    _pathFolderPrefab: {fileID: 6003219080901534645, guid: b5649efefca8004438c2e42c1eb0139a, type: 3}
+    _pathFolderPrefab: {fileID: 6003219080901534645, guid: b0ecaefccf274a449136dadcfc36d444, type: 3}
     _arrowBackButton: {fileID: 7080639483682528327}
     _arrowForwardButton: {fileID: 6782840548681986760}
     _exitButton: {fileID: 9130513981473772677}
@@ -671,7 +671,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1621527447}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bf77c2314c4b054ba81299623d6c1a0, type: 3}
+  m_Script: {fileID: 11500000, guid: eac6cba523c0474ca1b644e883c3541f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1488531849}
