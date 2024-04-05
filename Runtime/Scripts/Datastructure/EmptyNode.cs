@@ -47,7 +47,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			GameObject.Destroy(UIInstance);
 		}
 
-		public override void MissingPermissions()
+		public override void OnFailedToLoad(ENodeFailedToLoad reason)
 		{
 		}
 	}

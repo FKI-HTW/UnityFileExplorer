@@ -6,7 +6,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 {
 	internal class FolderNode : VirtualFolderNode, IEquatable<FolderNode>
 	{
-		public UINode UIInstance { get; private set; }
+		public UINode UIInstance { get; }
 
 		public FolderNode(ExplorerConfiguration config, NodeInformation info, VirtualFolderNode parent, List<TreeNode> children = null)
 			: base(config, info, parent, children)
@@ -52,9 +52,9 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			}
 		}
 
-		public override void MissingPermissions()
+		public override void OnFailedToLoad(ENodeFailedToLoad reason)
 		{
-			UIInstance.MissingPermissions();
+			UIInstance.OnFailedToLoad(reason);
 		}
 	}
 }

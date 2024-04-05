@@ -5,7 +5,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 {
 	internal class FileNode : TreeNode, IEquatable<FileNode>
 	{
-		public UINode UIInstance { get; private set; }
+		public UINode UIInstance { get; }
 
 		public FileNode(ExplorerConfiguration config, NodeInformation info, VirtualFolderNode parent)
 			: base(config, info, parent)
@@ -48,9 +48,9 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			GameObject.Destroy(UIInstance.gameObject);
 		}
 
-		public override void MissingPermissions()
+		public override void OnFailedToLoad(ENodeFailedToLoad reason)
 		{
-			UIInstance.MissingPermissions();
+			UIInstance.OnFailedToLoad(reason);
 		}
 	}
 }
