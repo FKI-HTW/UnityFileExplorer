@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 
 namespace CENTIS.UnityFileExplorer
 {
@@ -17,6 +18,8 @@ namespace CENTIS.UnityFileExplorer
 			set => _config = value; 
 		}
 
+		public event Action FolderPathUpdated;
+		
 		private VirtualFolderNode	_root; // a virtual folder above the disks
 		private VirtualFolderNode	_currentFolder;
 		private TreeNode			_selectedNode;
@@ -30,8 +33,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private Action<string> _fileFoundCallback;
 
-		private string _fileExtension;
-		private bool _certainFilesOnly = false;
+		private string[] _fileExtensions;
 
 		#endregion
 
@@ -40,22 +42,19 @@ namespace CENTIS.UnityFileExplorer
 		public virtual void FindFile(
 			Action<string> onFilePathFound = null,
 			Environment.SpecialFolder? startFolder = null,
-			string fileExtension = null
+			string[] fileExtensions = null
         ){
 			InitFileExplorer();
-			if (!string.IsNullOrEmpty(fileExtension))
-			{
-				_fileExtension = fileExtension;
-				_certainFilesOnly = true;
-			}
+			if (fileExtensions != null)
+				_fileExtensions = fileExtensions;
 
 			_fileFoundCallback = onFilePathFound;
 			_currentFolder = _root = new VirtualFolderNode(_config, new() { Name = "This PC" }, null);
 			_hashedNodes.Add(_root.ToString(), _root);
 
 			// create drive folders beneath virtual root
-			DriveInfo[] drives = DriveInfo.GetDrives();
-			foreach (DriveInfo drive in drives)
+			var drives = DriveInfo.GetDrives();
+			foreach (var drive in drives)
 			{
 				FolderNode diskNode = new(_config, drive.GetNodeInformation(), _root);
 				diskNode.OnSelected += SelectNode;
@@ -73,7 +72,7 @@ namespace CENTIS.UnityFileExplorer
 			}
 
 			// used to navigate to the given startFolder and create all nodes, that are visited during the navigation
-			string startFolderPath = Environment.GetFolderPath((Environment.SpecialFolder)startFolder);
+			var startFolderPath = Environment.GetFolderPath((Environment.SpecialFolder)startFolder);
 			DirectoryInfo startDir = new(startFolderPath);
 			VirtualFolderNode startParent = FindParentRecursive(startDir);
 			FolderNode startNode = new(_config, startDir.GetNodeInformation(), startParent);
@@ -94,11 +93,10 @@ namespace CENTIS.UnityFileExplorer
 			_hashedNodes.Clear();
 			_lastVisitedNodes.Clear();
 			_lastReturnedFromNodes.Clear();
-			foreach (PathNode node in _pathNodes)
-				GameObject.Destroy(node.UIInstance.gameObject);
+			foreach (var node in _pathNodes)
+				Destroy(node.UIInstance.gameObject);
 			_pathNodes.Clear();
-			_fileExtension = string.Empty;
-			_certainFilesOnly = false;
+			_fileExtensions = null;
 		}
 
 		#endregion
@@ -171,9 +169,8 @@ namespace CENTIS.UnityFileExplorer
 				case FileNode fileNode:
 					ChooseFile(fileNode);
 					break;
-				case EmptyNode:
 				default:
-					throw new Exception("How did this happen?");
+					throw new("How did this happen?");
 			}
 		}
 
@@ -193,26 +190,28 @@ namespace CENTIS.UnityFileExplorer
 		{
 			if (_config.PathContainer == null) return;
 
-			foreach (PathNode node in _pathNodes)
-				GameObject.Destroy(node.UIInstance.gameObject);
+			foreach (var node in _pathNodes)
+				DestroyImmediate(node.UIInstance.gameObject);
 			_pathNodes.Clear();
 
-			VirtualFolderNode folderNode = _currentFolder;
+			var folderNode = _currentFolder;
 			while (folderNode != null)
 			{
-				string name = folderNode.Info.Name.Replace("\\", "").Replace("/", "");
-				_pathNodes.Add(new() { FolderNode = folderNode, Name = name });
+				var nodeName = folderNode.Info.Name.Replace("\\", "").Replace("/", "");
+				_pathNodes.Add(new() { FolderNode = folderNode, Name = nodeName });
 				folderNode = folderNode.Parent;
 			}
 
-			for (int i = _pathNodes.Count - 1; i >= 0; i--)
+			for (var i = _pathNodes.Count - 1; i >= 0; i--)
 			{
-				PathNode node = _pathNodes[i];
-				UIPathFolder uiInstance = Instantiate(_config.PathFolderPrefab, _config.PathContainer.transform);
+				var node = _pathNodes[i];
+				var uiInstance = Instantiate(_config.PathFolderPrefab, _config.PathContainer.transform);
 				uiInstance.Initialize(node.Name);
 				uiInstance.OnActivated += () => ActivateNode(node.FolderNode);
 				node.UIInstance = uiInstance;
 			}
+
+			FolderPathUpdated?.Invoke();
 		}
 
 		private void GoBack()
@@ -268,9 +267,23 @@ namespace CENTIS.UnityFileExplorer
 						node.AddChild(emptyNode);
 					}
 				}
-			} catch (UnauthorizedAccessException) {
-				node.MissingPermissions();
-				return;
+			} catch (Exception e) {
+				switch (e)
+				{
+					case SecurityException:
+					case UnauthorizedAccessException:
+						node.OnFailedToLoad(ENodeFailedToLoad.MissingPermissions);
+						return;
+					case PathTooLongException:
+						node.OnFailedToLoad(ENodeFailedToLoad.PathTooLong);
+						return;
+					case IOException:
+						node.OnFailedToLoad(ENodeFailedToLoad.InvalidNode);
+						return;
+					default:
+						Console.WriteLine(e);
+						throw;
+				}
             }
 
 			_lastVisitedNodes.Add(_currentFolder);
@@ -289,9 +302,9 @@ namespace CENTIS.UnityFileExplorer
 
 		private void AddDirectories(VirtualFolderNode folder)
 		{
-			string folderPath = folder.ToString();
+			var folderPath = folder.ToString();
 			IEnumerable<DirectoryInfo> containedDir = new DirectoryInfo(folderPath).GetDirectories();
-			foreach (DirectoryInfo dir in containedDir)
+			foreach (var dir in containedDir)
 			{
 				FolderNode folderNode = new(_config, dir.GetNodeInformation(), folder);
 				folderNode.OnSelected += SelectNode;
@@ -304,12 +317,22 @@ namespace CENTIS.UnityFileExplorer
 
 		private void AddFiles(VirtualFolderNode folder)
 		{
-			string folderPath = folder.ToString();
+			var folderPath = folder.ToString();
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
-			foreach (FileInfo file in containedFiles)
+			foreach (var file in containedFiles)
 			{
-				if (_certainFilesOnly && !file.Name.EndsWith(_fileExtension)) continue;
-
+				var isCorrectType = false;
+				if (_fileExtensions != null)
+				{
+					foreach (var extension in _fileExtensions)
+					{
+						if (!file.Name.EndsWith(extension)) continue;
+						isCorrectType = true;
+						break;
+					}
+				}
+				if (!isCorrectType && _fileExtensions != null) continue;
+				
 				FileNode fileNode = new(_config, file.GetNodeInformation(), folder);
 				fileNode.OnSelected += SelectNode;
 				fileNode.OnDeselected += DeselectNode;

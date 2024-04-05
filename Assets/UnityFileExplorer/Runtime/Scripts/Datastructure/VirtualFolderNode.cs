@@ -40,7 +40,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 			}
 		}
 
-		public override void MissingPermissions()
+		public override void OnFailedToLoad(ENodeFailedToLoad reason)
 		{ 
 		}
 

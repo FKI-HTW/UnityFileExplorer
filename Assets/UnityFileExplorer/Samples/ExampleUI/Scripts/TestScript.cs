@@ -1,3 +1,4 @@
+using System;
 using CENTIS.UnityFileExplorer;
 using UnityEngine;
 
@@ -7,6 +8,6 @@ public class TestScript : MonoBehaviour
 
 	private void Start()
 	{
-		_manager.FindFile(onFilePathFound: Debug.Log, null, ".dll"); // for testing
+		_manager.FindFile(onFilePathFound: Debug.Log, Environment.SpecialFolder.Desktop, new [] { ".stp", ".fbx" });
 	}
 }
