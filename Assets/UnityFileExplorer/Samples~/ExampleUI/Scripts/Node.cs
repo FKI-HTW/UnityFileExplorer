@@ -11,8 +11,8 @@ public class Node : UINode
 		_name.text = gameObject.name = info.Name;
 	}
 
-	public override void MissingPermissions()
+	public override void OnFailedToLoad(ENodeFailedToLoad reason)
 	{
-		Debug.LogError("Unauthorized Access!");
+		Debug.LogError($"Failed to load node because: {reason}");
 	}
 }

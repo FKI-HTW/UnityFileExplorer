@@ -10,7 +10,7 @@ namespace CENTIS.UnityFileExplorer
         public event Action OnActivated;
 
         public abstract void Initialize(NodeInformation nodeInformation);
-        public abstract void MissingPermissions();
+        public abstract void OnFailedToLoad(ENodeFailedToLoad reason);
 
         public void Select() => OnSelected?.Invoke();
         public void Deselect() => OnDeselected?.Invoke();

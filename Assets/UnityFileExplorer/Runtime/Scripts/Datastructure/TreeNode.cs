@@ -42,7 +42,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		public abstract void Show();
 		public abstract void Hide();
 		public abstract void Unload();
-		public abstract void MissingPermissions();
+		public abstract void OnFailedToLoad(ENodeFailedToLoad reason);
 
 		protected void Select(TreeNode node) => OnSelected?.Invoke(node);
 		protected void Deselect(TreeNode node) => OnDeselected?.Invoke(node);
