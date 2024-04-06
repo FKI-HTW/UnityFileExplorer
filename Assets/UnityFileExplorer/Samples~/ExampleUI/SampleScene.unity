@@ -603,18 +603,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67e8b2f1ead44bd0b54963ee06c8a752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _config:
-    _nodeContainer: {fileID: 6619407280462070432}
-    _folderPrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}
-    _filePrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}
-    _emptyFolderPrefab: {fileID: 4921745232775827764, guid: f6503fff278444d0856c6225615d72e3, type: 3}
-    _pathContainer: {fileID: 6619407280820904100}
-    _pathFolderPrefab: {fileID: 6003219080901534645, guid: b0ecaefccf274a449136dadcfc36d444, type: 3}
-    _arrowBackButton: {fileID: 7080639483682528327}
-    _arrowForwardButton: {fileID: 6782840548681986760}
-    _exitButton: {fileID: 9130513981473772677}
-    _cancelButton: {fileID: 618745549734603717}
-    _confirmButton: {fileID: 1902456509}
+  _config: {_nodeContainer: {fileID: 6619407280462070432}, _folderPrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}, _filePrefab: {fileID: 3905607546762081316, guid: 2516e84b40ae449cb8e9458f239455e0, type: 3}, _emptyFolderPrefab: {fileID: 4921745232775827764, guid: f6503fff278444d0856c6225615d72e3, type: 3}, _pathContainer: {fileID: 6619407280820904100}, _pathFolderPrefab: {fileID: 6003219080901534645, guid: b0ecaefccf274a449136dadcfc36d444, type: 3}, _arrowBackButton: {fileID: 7080639483682528327}, _arrowForwardButton: {fileID: 6782840548681986760}, _exitButton: {fileID: 9130513981473772677}, _cancelButton: {fileID: 618745549734603717}, _confirmButton: {fileID: 1902456509}}
+  _fileExtensions: []
 --- !u!4 &1488531850
 Transform:
   m_ObjectHideFlags: 0
