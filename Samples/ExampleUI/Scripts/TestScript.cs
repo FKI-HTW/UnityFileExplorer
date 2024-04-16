@@ -8,6 +8,6 @@ public class TestScript : MonoBehaviour
 
 	private void Start()
 	{
-		_manager.FindFile(onFilePathFound: Debug.Log, Environment.SpecialFolder.Desktop, new [] { ".stp", ".fbx" });
+		_manager.FindFile(onFilePathFound: Debug.Log, Environment.SpecialFolder.Desktop, new [] { ".stp", ".gltf", ".glb" });
 	}
 }

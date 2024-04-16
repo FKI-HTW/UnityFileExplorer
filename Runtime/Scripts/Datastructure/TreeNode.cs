@@ -23,7 +23,7 @@ namespace CENTIS.UnityFileExplorer.Datastructure
 		{
 			if (string.IsNullOrEmpty(Info?.Path)) 
 				return Info.Name;
-			return $"{Info.Path}/{Info.Name}";
+			return $@"{Info.Path}\{Info.Name}".Replace(@"\\", @"\");
 		}
 
 		public override int GetHashCode()
