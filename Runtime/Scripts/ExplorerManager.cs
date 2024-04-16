@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security;
 
 namespace CENTIS.UnityFileExplorer
@@ -73,15 +74,10 @@ namespace CENTIS.UnityFileExplorer
 
 			// used to navigate to the given startFolder and create all nodes, that are visited during the navigation
 			var startFolderPath = Environment.GetFolderPath((Environment.SpecialFolder)startFolder);
-			DirectoryInfo startDir = new(startFolderPath);
-			VirtualFolderNode startParent = FindParentRecursive(startDir);
-			FolderNode startNode = new(_config, startDir.GetNodeInformation(), startParent);
-			startNode.OnSelected += SelectNode;
-			startNode.OnDeselected += DeselectNode;
-			startNode.OnActivated += ActivateNode;
-			startParent.AddChild(startNode);
-			_hashedNodes.Add(startNode.ToString(), startNode);
-			NavigateToNode(startNode);
+			var startNode = FindStartFolder(new(startFolderPath));
+			LoadFolder(startNode);
+			_currentFolder = startNode;
+			_currentFolder.NavigateTo();
 			UpdatePath();
 		}
 
@@ -256,35 +252,7 @@ namespace CENTIS.UnityFileExplorer
 
 		private void NavigateToNode(VirtualFolderNode node)
 		{
-			try {
-				if (!node.IsFolderLoaded)
-				{
-					AddDirectories(node);
-					AddFiles(node);
-					if (!node.IsFolderLoaded || node.Children.Count == 0)
-					{
-						EmptyNode emptyNode = new(_config, node);
-						node.AddChild(emptyNode);
-					}
-				}
-			} catch (Exception e) {
-				switch (e)
-				{
-					case SecurityException:
-					case UnauthorizedAccessException:
-						node.OnFailedToLoad(ENodeFailedToLoad.MissingPermissions);
-						return;
-					case PathTooLongException:
-						node.OnFailedToLoad(ENodeFailedToLoad.PathTooLong);
-						return;
-					case IOException:
-						node.OnFailedToLoad(ENodeFailedToLoad.InvalidNode);
-						return;
-					default:
-						Console.WriteLine(e);
-						throw;
-				}
-            }
+			if (!LoadFolder(node)) return;
 
 			_lastVisitedNodes.Add(_currentFolder);
 			_lastReturnedFromNodes.Clear();
@@ -298,6 +266,40 @@ namespace CENTIS.UnityFileExplorer
 			_currentFolder.NavigateTo();
 
 			UpdatePath();
+		}
+
+		private bool LoadFolder(VirtualFolderNode node)
+		{
+			if (node.IsFolderLoaded) return true;
+			
+			try
+			{
+				AddDirectories(node);
+				AddFiles(node);
+				if (!node.IsFolderLoaded || node.Children.Count == 0)
+				{
+					EmptyNode emptyNode = new(_config, node);
+					node.AddChild(emptyNode);
+				}
+
+				return true;
+			} catch (Exception e) {
+				switch (e)
+				{
+					case SecurityException:
+					case UnauthorizedAccessException:
+						node.OnFailedToLoad(ENodeFailedToLoad.MissingPermissions);
+						return false;
+					case PathTooLongException:
+						node.OnFailedToLoad(ENodeFailedToLoad.PathTooLong);
+						return false;
+					case IOException:
+						node.OnFailedToLoad(ENodeFailedToLoad.InvalidNode);
+						return false;
+					default:
+						throw;
+				}
+			}
 		}
 
 		private void AddDirectories(VirtualFolderNode folder)
@@ -321,17 +323,9 @@ namespace CENTIS.UnityFileExplorer
 			IEnumerable<FileInfo> containedFiles = new DirectoryInfo(folderPath).GetFiles();
 			foreach (var file in containedFiles)
 			{
-				var isCorrectType = false;
-				if (_fileExtensions != null)
-				{
-					foreach (var extension in _fileExtensions)
-					{
-						if (!file.Name.EndsWith(extension)) continue;
-						isCorrectType = true;
-						break;
-					}
-				}
-				if (!isCorrectType && _fileExtensions != null) continue;
+				if (_fileExtensions != null
+				    && !_fileExtensions.Any(extension => file.Name.EndsWith(extension)))
+					continue;
 				
 				FileNode fileNode = new(_config, file.GetNodeInformation(), folder);
 				fileNode.OnSelected += SelectNode;
@@ -342,19 +336,19 @@ namespace CENTIS.UnityFileExplorer
 			}
 		}
 
-		private FolderNode FindParentRecursive(DirectoryInfo userDir)
+		private FolderNode FindStartFolder(DirectoryInfo userDir)
 		{
-			if (_hashedNodes.TryGetValue(userDir.Parent.ToString(), out TreeNode parent))
-				return (FolderNode)parent;
-
-			FolderNode nextParent = FindParentRecursive(userDir.Parent);
-			FolderNode newNode = new(_config, userDir.Parent.GetNodeInformation(), nextParent);
-			newNode.OnSelected += SelectNode;
-			newNode.OnDeselected += DeselectNode;
-			newNode.OnActivated += ActivateNode;
-			nextParent.AddChild(newNode);
-			_hashedNodes.Add(newNode.ToString(), newNode);
-			return newNode;
+			if (userDir == null)
+				throw new("Something went wrong opening the file explorer!");
+			
+			if (_hashedNodes.TryGetValue(userDir.ToString(), out var node))
+				return (FolderNode)node;
+			var parent = FindStartFolder(userDir.Parent);
+			LoadFolder(parent);
+			if (_hashedNodes.TryGetValue(userDir.ToString(), out var newNode))
+				return (FolderNode)newNode;
+			
+			throw new("Something went wrong opening the file explorer!");
 		}
 
 		#endregion
