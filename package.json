@@ -1,15 +1,15 @@
 {
     "name": "de.htw-berlin.centis.unityfileexplorer",
-    "version": "0.1.5",
-    "displayName": "UnityFileExplorer",
+    "version": "0.2.0",
+    "displayName": "Unity File Explorer",
     "description": "",
     "unity": "2022.3",
-    "unityRelease": "11f1",
-    "documentationUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/README.md",
-    "changelogUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/CHANGELOG.md",
-    "licensesUrl": "https://github.com/CENTIS-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/LICENSE.md",
+    "documentationUrl": "https://github.com/FKI-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/README.md",
+    "changelogUrl": "https://github.com/FKI-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/CHANGELOG.md",
+    "licensesUrl": "https://github.com/FKI-HTW/UnityFileExplorer/blob/main/Assets/UnityFileExplorer/LICENSE.md",
     "keywords": [
-        "Unity Package"
+        "Unity Package",
+        "File Explorer"
     ],
     "samples": [
         {
